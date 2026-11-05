@@ -1,5 +1,10 @@
-# Telegrapher 1.4 — Web
+# Telegrapher 1.5 — Web edition
 
-Serve this folder using `python -m http.server 8000` or copy its contents directly into the GitHub Pages publishing root. Android-specific system inset padding is activated only by the Android WebView wrapper.
+Serve this directory with `python -m http.server 8000` and visit http://localhost:8000.
+For GitHub Pages, copy these files directly to the publishing root.
 
-See CHANGELOG.md and in_next.txt.
+Compose > Settings > Touch feedback: Off, Gentle, Crafted (default), Expressive.
+On Android the native vibration bridge is used; on the web vibration is best effort and may be unsupported.
+The haptic setting is local to each installation and does not change exported WAV timing.
+
+Tests: `npm test`. See CHANGELOG.md and in_next.txt.

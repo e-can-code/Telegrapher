@@ -1,13 +1,13 @@
 // Network-first application shell for the browser edition. The Android build
 // bundles the same assets locally and does not depend on this worker.
-const CACHE = 'telegrapher-v1.3';
+const CACHE = 'telegrapher-v1.5';
 const ASSETS = [
   './', './index.html', './icon.svg', './manifest.webmanifest',
   './styles/tokens.css', './styles/compose.css', './styles/layout.css',
   './styles/foundation.css', './styles/telegrapher12.css', './styles/telegrapher13.css',
   './js/workspace-shell.js', './js/app.js', './js/library-controller.js',
   './js/listen/quiet-controller.js', './js/storage/library.js',
-  './js/compose/compose-controller.js', './js/audio/synthesis.js'
+  './js/compose/compose-controller.js', './js/compose/haptics.js', './js/audio/synthesis.js'
 ];
 self.addEventListener('install', event => event.waitUntil(
   caches.open(CACHE).then(cache => cache.addAll(ASSETS)).then(() => self.skipWaiting())

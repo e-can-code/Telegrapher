@@ -1,1 +1,7 @@
-Verify footer on the physical phone using both three-button navigation and gesture navigation. Test short-display phones, display-size enlargement, and long messages. Native system inset values differ by manufacturer; the 82px supplemental reserve is deliberately conservative and may be reduced only after device evidence. Confirm audio export, notes, and Library persistence.
+Telegrapher 1.5 follow-up
+1. Verify haptic contact and threshold timing on at least two physical Android phones. Vibration strength varies by hardware; adjust durations based on testers' comfort.
+2. Verify that the device's vibration-off / accessibility preferences are honored by the OS.
+3. Listen critically to live versus exported WAV across all sound profiles; current live synthesis is improved but sample-based sound design remains future work.
+4. Re-test Compose bottom buttons against three-button Android navigation and keyboard insets.
+5. Verify Compose -> Listen -> Library and Notes persistence across Android updates.
+6. Check web fallback on Firefox/Chrome and verify that no vibration support is handled silently.

@@ -1,7 +1,10 @@
-# Telegrapher 1.4
+# Telegrapher 1.5 — Tactile Instrument
 
-- Reserved an intentionally generous Android-only bottom clearance zone in addition to native system-bar insets.
-- Kept Play and Share Audio in the normal layout flow, above the reserved zone.
-- Bounded message-panel growth and improved the prominence of the decoded message.
-- Moved alternative readings beneath the decoded message and reduced their visual weight.
-- Preserved Gathering Light, input, playback, Notes, and Library behavior.
+- Added Android-native contact, dah-threshold, and optional release haptic pulses.
+- Added Off, Gentle, Crafted (default), and Expressive touch-feedback preferences.
+- Added best-effort browser vibration fallback; unsupported browsers remain fully usable.
+- Matched live-tone harmonic synthesis to the existing sound profile's harmonic weights rather than reducing multi-harmonic profiles to triangle waves.
+- Smoothed the live dit-to-dah pitch transition.
+- Preserved Compose, Quiet, Notes, Library, and v1.4 layout.
+
+Android compilation and physical-device haptic quality require local verification.

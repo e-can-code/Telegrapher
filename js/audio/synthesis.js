@@ -1,6 +1,14 @@
 import {soundProfile,sampleTone} from './sound-profiles.js';
 import {eventsFor} from '../core/morse.js';
 let context,osc,gain,live=false,livePitch=600,liveProfile="classic";
+const waves=new Map();
+function profileWave(c,p){
+  if(waves.has(p.id))return waves.get(p.id);
+  const real=new Float32Array(p.harmonics.length+1),imag=new Float32Array(real.length);
+  p.harmonics.forEach((v,i)=>{imag[i+1]=v;});
+  const wave=c.createPeriodicWave(real,imag,{disableNormalization:false});
+  waves.set(p.id,wave);return wave;
+}
 function ctx(){context??=new (window.AudioContext||window.webkitAudioContext)({latencyHint:'interactive'});return context;}
 function prepare(){
   const c=ctx();
@@ -13,12 +21,12 @@ function prepare(){
 export function warmAudio(){const c=prepare();if(c.state!=='running')void c.resume().catch(()=>{});}
 export function startTone(pitch,volume,profileId="classic"){
   const c=prepare();if(c.state!=='running')void c.resume().catch(()=>{});
-  const t=c.currentTime;live=true;livePitch=pitch;liveProfile=profileId;const p=soundProfile(profileId);osc.type=p.harmonics.length>1?"triangle":"sine";osc.frequency.setValueAtTime(pitch*p.dit,t);
+  const t=c.currentTime;live=true;livePitch=pitch;liveProfile=profileId;const p=soundProfile(profileId);osc.setPeriodicWave(profileWave(c,p));osc.frequency.cancelScheduledValues(t);osc.frequency.setValueAtTime(pitch*p.dit,t);
   gain.gain.cancelScheduledValues(t);gain.gain.setValueAtTime(gain.gain.value,t);
   // A 2 ms attack limits clicks without an audible intentional delay.
   gain.gain.linearRampToValueAtTime(volume*.28,t+soundProfile(profileId).attack);
 }
-export function setLongTone(){if(!live||!osc)return;const p=soundProfile(liveProfile),t=ctx().currentTime;osc.frequency.setTargetAtTime(livePitch*p.dah,t,.006);}
+export function setLongTone(){if(!live||!osc)return;const p=soundProfile(liveProfile),t=ctx().currentTime;osc.frequency.cancelScheduledValues(t);osc.frequency.setTargetAtTime(livePitch*p.dah,t,.009);}
 export function stopTone(){
   if(!osc||!live)return;live=false;const c=ctx(),t=c.currentTime;
   gain.gain.cancelScheduledValues(t);gain.gain.setValueAtTime(gain.gain.value,t);

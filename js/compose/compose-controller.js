@@ -6,6 +6,7 @@ import {classifyMark,boundaryState,INPUT} from '../core/intent.js';
 import * as message from '../core/message.js';
 import {backspace} from './backspace-model.js';
 import {Illumination} from './illumination.js';
+import {tactileEvent,HAPTIC_MODES} from './haptics.js';
 import {PlaybackHighlight} from '../audio/playback-timeline.js';
 import {startTone,stopTone,setLongTone,warmAudio,wavFor,playWav,stopPlayback,pausePlayback,resumePlayback} from '../audio/synthesis.js';
 import {load,save,loadDraft} from '../storage/storage.js';
@@ -13,6 +14,9 @@ import {decodeEvents,timingProfile,updateProfile} from '../core/decoder.js';
 import {saveSession,loadProfile,saveProfile,archiveMessage,loadHistory,clearLearningData} from '../storage/event-log.js';
 const $=id=>document.getElementById(id);
 const state=load();
+const HAPTICS_KEY='telegrapher-haptics';
+let hapticMode=(()=>{try{return localStorage.getItem(HAPTICS_KEY)||'crafted';}catch{return 'crafted';}})();
+if(!HAPTIC_MODES.includes(hapticMode))hapticMode='crafted';
 const tempo=new Tempo(unitForWpm(9),state.autoTempo,state.sendBand);
 const light=new Illumination($('key'));
 const highlighting=new PlaybackHighlight($('tiles'));
@@ -115,14 +119,16 @@ function begin(e){
   liveBoundary='inside';
   active={start:now,unit,gap:decision.gap,gapTime,explicit,reconsidered:decision.reconsidered,device:e?.pointerId!==undefined?'pointer':'keyboard'};explicitGap=null;
   $('key').classList.add('pressed');light.begin(unit);status('Sending…');
+  if(active.device==='pointer')tactileEvent(hapticMode,'contact');
   startTone(state.pitch,state.volume/100,state.soundProfile);
-  clearTimeout(longToneTimer);longToneTimer=setTimeout(()=>{if(active)setLongTone();},(INPUT[state.sendBand]||INPUT.comfortable).dah);
+  clearTimeout(longToneTimer);longToneTimer=setTimeout(()=>{if(active){setLongTone();if(active.device==='pointer')tactileEvent(hapticMode,'threshold');}},(INPUT[state.sendBand]||INPUT.comfortable).dah);
 }
 function finish(e,cancel=false){
   if(!active)return;e?.preventDefault();
   const now=performance.now(),duration=now-active.start,{unit,gap,gapTime,explicit,reconsidered}=active;
   const activeStart=active.start,inputDevice=active.device;
   active=null;clearTimeout(longToneTimer);$('key').classList.remove('pressed');stopTone();
+  if(!cancel&&inputDevice==='pointer')tactileEvent(hapticMode,'release');
   if(cancel){light.reset();lastRelease=null;status('Interrupted');return;}
   lastRelease=now;light.release(unit);liveBoundary='inside';
   if(duration>=25){
@@ -212,6 +218,8 @@ const soundSelect=$('soundProfile');
 for(const p of SOUND_PROFILES){const option=document.createElement('option');option.value=p.id;option.textContent=p.name+(p.kind==='radio'?' · radio':' · instrument');soundSelect.append(option);}
 state.soundProfile=state.soundProfile||'classic';soundSelect.value=state.soundProfile;
 soundSelect.onchange=()=>{state.soundProfile=soundSelect.value;save(state);};
+const hapticSelect=$('hapticMode');
+if(hapticSelect){hapticSelect.value=hapticMode;hapticSelect.onchange=()=>{hapticMode=hapticSelect.value;try{localStorage.setItem(HAPTICS_KEY,hapticMode);}catch{}};}
 $('settingsBtn').onclick=()=>{warmAudio();$('settingsDialog').showModal();};
 $('closeSettings').onclick=$('doneSettings').onclick=()=>$('settingsDialog').close();
 for(const [id,suffix] of [['pitch',' Hz'],['speed',' WPM'],['volume','%']]){
