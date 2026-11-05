@@ -1,32 +1,18 @@
-# Telegrapher 2.2 — Sound Engine Stabilization
+# Telegrapher 2.3.1 — Web Receiver restoration
 
-## Corrected
-
-- Replaced independent playback-rate-driven listening with a single Web Audio buffer transport.
-- Removed the fixed 65 ms visual offset as the authoritative light timing model.
-- Kept the mechanical start cue audible, but excluded it from the Morse event map and illumination.
-- Preserved resting firefly breathing and disabled it during all active playback, including lead-in and loop silence.
-- Connected Quiet and Receiver illumination to the buffered transport's output-aware timeline.
-- Introduced versioned web asset caching (`telegrapher-v2.2`) and a safer Receiver initialization failure message.
-
-## Added
-
-- Clean Morse resynthesis from exact Compose metadata or detected tone events, preserving pitch and proportionate silence at supported speeds.
-- Buffered WSOLA time-stretch for the **original imported WAV**, preserving the recorded audio separately from the optional clean reconstruction.
-- Explicit Original WAV / Clean Morse playback-mode controls.
-- Compact Fine speed control and 0.5×–2× supported range.
-- Output scheduling for single-word and whole-recording looping, including a playback-only gap.
-- Audio pitch and event-boundary regression tests.
+## Fixed
+- Replaced the web edition's native ES-module entry point with a prebuilt classic JavaScript bundle generated from the same canonical modules. This avoids browser `file://` module-loading failures and reduces sensitivity to partial module caching.
+- Included the complete browser bundle in the versioned offline resource list (`telegrapher-v2.3.1`).
+- Added a visible startup error if the bundle itself is missing, rather than silently presenting a nonfunctional page.
+- Updated the browser title to match the distributed release.
 
 ## Preserved
+- Compose optional message names, Library title persistence and named WAV exports introduced in 2.3.
+- Receiver's ordered word rail, focused Living Metal Armillary, source selection, looping, playback speed, Notes, and Room navigation.
+- Quiet's firefly, Compose's Gathering Light, the Brass Helmsman, native Android file handling and existing audio engine.
 
-- Compose's WAV export, Gathering Light, input, haptics, and message editing.
-- Quiet's visual design and Receiver's ordered word rail and Celestial Armillary.
-- Notes and Library persistence, Android file intents, and navigation-bar clearance.
+## Platform difference
+- The web edition starts from `js/telegrapher-bundle.js` (classic script); the Android WebView edition retains its existing working ES-module entry point. The underlying application source files remain identical.
+- Android project version name `2.3.1`, version code `24`; application ID unchanged.
 
-## Limitations
-
-- The web Renderer was validated through an inlined local Chromium harness, not a deployed GitHub Pages session or Firefox runtime. Real deployment still requires verification.
-- Original WAV time stretching remains approximate, especially on highly noisy/complex source audio; Clean Morse is an explicitly selectable alternative.
-- Device output/display latency requires listening tests on physical Android hardware. A shared output timeline reduces onset mismatch but cannot eliminate hardware variability.
-- No Android APK was compiled in this environment; the Android Studio project is supplied for local compilation.
+This is a compatibility hotfix rather than a change to audio synthesis or visual design.

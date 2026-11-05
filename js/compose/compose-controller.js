@@ -1,4 +1,5 @@
 import {putMessage,messageId} from '../storage/library.js';
+import {normalizeMessageTitle,resolvedMessageTitle,wavFilename} from './message-naming.js';
 import {SOUND_PROFILES} from '../audio/sound-profiles.js';
 import {decode,textOf,counts} from '../core/morse.js';
 import {Tempo,unitForWpm} from '../core/tempo.js';
@@ -73,17 +74,43 @@ function showSuggestions(){
 }
 function status(value){$('status').textContent=value;}
 function remember(){undo.push(message.copy(state.chars));if(undo.length>100)undo.shift();redo=[];}
-function change(next){remember();state.chars=next;if(selectedIndex>=next.length)selectedIndex=-1;readyToSave=true;render();}
+function change(next){remember();state.chars=next;persistDraftName();if(selectedIndex>=next.length)selectedIndex=-1;readyToSave=true;render();}
 let libraryDraftId=sessionStorage.getItem('morse-library-draft-id')||messageId();
 try{sessionStorage.setItem('morse-library-draft-id',libraryDraftId);}catch{}
+const DRAFT_NAME_KEY='telegrapher-compose-draft-name';
+let customTitle='';
 let librarySaveTimer;
+function titleForCompose(){return resolvedMessageTitle(customTitle,textOf(state.chars));}
+function persistDraftName(){
+  try{localStorage.setItem(DRAFT_NAME_KEY,JSON.stringify({title:customTitle,id:libraryDraftId}));}catch{}
+}
+function restoreDraftName(){
+  try{return normalizeMessageTitle(JSON.parse(localStorage.getItem(DRAFT_NAME_KEY)||'{}').title);}catch{return '';}
+}
+function showMessageName(){if(document.activeElement!==$('composeName'))$('composeName').value=customTitle;}
 function queueLibrarySave(){
   clearTimeout(librarySaveTimer);
   if(!state.chars.length)return;
-  const chars=message.copy(state.chars),title=textOf(chars).trim().slice(0,55)||'Untitled composition';
-  librarySaveTimer=setTimeout(()=>{void putMessage({id:libraryDraftId,kind:'composed',title,chars,audio:wavFor(chars,state.speed,state.pitch,state.soundProfile),morseMeta:{chars,wpm:state.speed,pitch:state.pitch,soundProfile:state.soundProfile}}).then(()=>document.dispatchEvent(new Event('morse:library-updated'))).catch(console.warn);},450);
+  const chars=message.copy(state.chars),title=titleForCompose(),titleMode=customTitle?'manual':'auto';
+  const saveId=libraryDraftId;
+  librarySaveTimer=setTimeout(()=>{void putMessage({id:saveId,kind:'composed',title,titleMode,chars,audio:wavFor(chars,state.speed,state.pitch,state.soundProfile),morseMeta:{chars,wpm:state.speed,pitch:state.pitch,soundProfile:state.soundProfile}}).then(()=>document.dispatchEvent(new Event('morse:library-updated'))).catch(console.warn);},450);
 }
-document.addEventListener('morse:library-open-compose',event=>{cancelBoundaryTimer();stop();state.chars=message.copy(event.detail.chars||[]);libraryDraftId=event.detail.id;try{sessionStorage.setItem('morse-library-draft-id',libraryDraftId);}catch{}readyToSave=true;render();});
+$('composeName').addEventListener('input',event=>{
+  customTitle=normalizeMessageTitle(event.target.value);
+  persistDraftName();
+  queueLibrarySave();
+});
+$('composeName').addEventListener('blur',()=>showMessageName());
+$('composeName').addEventListener('keydown',event=>{if(event.key==='Enter'){event.preventDefault();$('composeName').blur();}});
+document.addEventListener('morse:library-open-compose',event=>{
+  cancelBoundaryTimer();stop();clearTimeout(librarySaveTimer);
+  state.chars=message.copy(event.detail.chars||[]);
+  libraryDraftId=event.detail.id;
+  customTitle=event.detail.titleMode==='manual'?normalizeMessageTitle(event.detail.title):'';
+  persistDraftName();showMessageName();
+  try{sessionStorage.setItem('morse-library-draft-id',libraryDraftId);}catch{}
+  readyToSave=true;render();
+});
 function render(){
   const tiles=$('tiles');tiles.replaceChildren();
   state.chars.forEach((c,i)=>{
@@ -190,10 +217,10 @@ $('backspaceBtn').onclick=()=>{
 };
 $('deleteWordBtn').onclick=()=>removeWholeWord(selectedIndex>=0?selectedIndex:state.chars.length-1);
 $('deleteSelectedWord').onclick=()=>{removeWholeWord(editIndex);$('editDialog').close();};
-$('clearBtn').onclick=()=>{if(!state.chars.length)return;selectedIndex=-1;cancelBoundaryTimer();liveBoundary='inside';archiveMessage(message.copy(state.chars));clearTimeout(librarySaveTimer);libraryDraftId=messageId();try{sessionStorage.setItem('morse-library-draft-id',libraryDraftId);}catch{}change([]);lastRelease=null;explicitGap=null;lastBoundaryExplicit=false;rawEvents=[];showSuggestions();light.reset();status('New message · Undo to restore');};
+$('clearBtn').onclick=()=>{if(!state.chars.length)return;selectedIndex=-1;cancelBoundaryTimer();liveBoundary='inside';archiveMessage(message.copy(state.chars));clearTimeout(librarySaveTimer);libraryDraftId=messageId();customTitle='';persistDraftName();showMessageName();try{sessionStorage.setItem('morse-library-draft-id',libraryDraftId);}catch{}change([]);lastRelease=null;explicitGap=null;lastBoundaryExplicit=false;rawEvents=[];showSuggestions();light.reset();status('New message · Undo to restore');};
 $('letterBtn').onclick=()=>{cancelBoundaryTimer();showBoundary('letter');explicitGap='letter';lastRelease=null;lastBoundaryExplicit=true;status('Next mark begins a letter');};
 $('wordBtn').onclick=()=>{cancelBoundaryTimer();showBoundary('word');explicitGap='word';lastRelease=null;lastBoundaryExplicit=true;status('Next mark begins a word');};
-$('resumeBtn').onclick=()=>{const draft=previousDraft;if(draft.length){change(draft);$('resumeBtn').hidden=true;status('Draft restored');}};
+$('resumeBtn').onclick=()=>{const draft=previousDraft;if(draft.length){customTitle=restoreDraftName();showMessageName();change(draft);$('resumeBtn').hidden=true;status('Draft restored');}};
 function openEdit(i){selectedIndex=i;editIndex=i;render();renderEdit();$('editDialog').showModal();}
 function renderEdit(){
   const c=state.chars[editIndex];if(!c)return;
@@ -262,8 +289,9 @@ $('playBtn').onclick=()=>{
   playbackControls('playing');
 };
 $('shareBtn').onclick=async()=>{
-  const file=new File([wavFor(state.chars,state.speed,state.pitch,state.soundProfile)],'morse-message.wav',{type:'audio/wav'});
-  try{if(navigator.canShare?.({files:[file]})){await navigator.share({files:[file],title:'Morse message'});status('Shared');return;}}
+  const title=titleForCompose();
+  const file=new File([wavFor(state.chars,state.speed,state.pitch,state.soundProfile)],wavFilename(title),{type:'audio/wav'});
+  try{if(navigator.canShare?.({files:[file]})){await navigator.share({files:[file],title});status('Shared');return;}}
   catch(e){if(e.name==='AbortError')return;}
   if(window.AndroidFiles?.saveWav){const bytes=new Uint8Array(await file.arrayBuffer());let binary='';for(let i=0;i<bytes.length;i+=8192)binary+=String.fromCharCode(...bytes.subarray(i,i+8192));window.AndroidFiles.saveWav(file.name,btoa(binary));status('WAV sent to Android Downloads');}else{const url=URL.createObjectURL(file),a=document.createElement('a');a.href=url;a.download=file.name;a.click();setTimeout(()=>URL.revokeObjectURL(url),10000);status('WAV downloaded');}
 };
@@ -282,7 +310,7 @@ const previousDraft=loadDraft();$('resumeBtn').hidden=!previousDraft.length;rend
 document.addEventListener('morse:request-export', event => {
   const {accept, reject} = event.detail || {};
   if (!state.chars.length) { reject?.('Compose a message first, or open a WAV.'); return; }
-  try { accept?.(wavFor(state.chars, state.speed, state.pitch, state.soundProfile), {chars:state.chars.map(c=>({...c})),wpm:state.speed,pitch:state.pitch,soundProfile:state.soundProfile}); }
+  try { accept?.(wavFor(state.chars, state.speed, state.pitch, state.soundProfile), {chars:state.chars.map(c=>({...c})),wpm:state.speed,pitch:state.pitch,soundProfile:state.soundProfile,title:titleForCompose(),filename:wavFilename(titleForCompose())}); }
   catch (error) { reject?.(error.message || 'Unable to export this composition.'); }
 });
 function announceComposeAvailability() {

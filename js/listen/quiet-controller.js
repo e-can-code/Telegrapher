@@ -191,7 +191,7 @@ export function initQuiet(){
  for(const id of ['listenFile','listenFileEmpty'])$(id).addEventListener('change',async e=>{const file=e.target.files?.[0];if(file)await load(file,file.name);e.target.value='';});
  $('listenFromCompose').addEventListener('click',()=>{
   let answered=false;
-  document.dispatchEvent(new CustomEvent('morse:request-export',{detail:{accept:async(blob,meta)=>{answered=true;await load(blob,'Composed message.wav',{meta});},reject:reason=>{answered=true;error(String(reason));}}}));
+  document.dispatchEvent(new CustomEvent('morse:request-export',{detail:{accept:async(blob,meta)=>{answered=true;await load(blob,meta?.title||'Composed message',{meta});},reject:reason=>{answered=true;error(String(reason));}}}));
   if(!answered)error('Compose is not ready. Create a message first or open a WAV.');
  });
  $('listenPlay').addEventListener('click',()=>void togglePlayback());
@@ -272,7 +272,7 @@ export function initQuiet(){
   });
  });
  document.addEventListener('morse:library-open-audio',async e=>{const entry=e.detail;const saved=entry.audio?entry:await getMessage(entry.id);if(saved?.audio)await load(saved.audio,saved.title,{id:saved.id,persist:false,notes:saved.notes,meta:saved.morseMeta||((saved.chars?.length&&saved.wpm)?{chars:saved.chars,wpm:saved.wpm,pitch:saved.pitch,soundProfile:saved.soundProfile}:null)});});
- document.addEventListener('morse:workspace',e=>{if(e.detail.name==='compose'){cancelReplay();audio.pause();renderer.stop();living.stop();void saveNotes();}else if(mode==='receiver')renderer.start();});
- window.addEventListener('pagehide',()=>{cancelAnimationFrame(fireflyFrame);cancelReplay();audio.pause();renderer.stop();void saveNotes();});
+ document.addEventListener('morse:workspace',e=>{if(e.detail.name==='compose'){audio.pause();renderer.stop();living.stop();void saveNotes();}else if(mode==='receiver')renderer.start();});
+ window.addEventListener('pagehide',()=>{cancelAnimationFrame(fireflyFrame);audio.pause();renderer.stop();void saveNotes();});
  update();
 }

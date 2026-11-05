@@ -1,25 +1,9 @@
-# Telegrapher 2.2 — Release candidate
+# Telegrapher 2.3.1 — Receiver Compatibility Hotfix
 
-**Main objective:** Make Morse audio and illumination behave as one predictable instrument. The mechanical cue remains audio-only; it never drives a Morse light flare.
+The previous 2.3 web ZIP included the Receiver but depended on native ES-module imports, which may not load from a locally opened HTML file in some desktop browsers. The new web package includes a prebuilt standalone classic-script entry point. No web build step is needed.
 
-Web: extract `Telegrapher_wv2.2.zip` and publish its contents, with `index.html` at the root. Android: extract `Telegrapher_v2.2.zip`, open in Android Studio, and build an APK. Source is matched across the two editions.
+**Test first:** Extract the complete web archive and open `index.html`. Select Listen → Receiver. An empty recording should show instructions; after importing a WAV in Quiet, Receiver should show numbered word armillaries. Try focusing Word 2 and returning to the overview. For persistent Library testing, serve over HTTP or publish to GitHub Pages.
 
-### Verification completed
+**Browser checks performed:** Built web script passes syntax validation; Chromium using an inlined application fixture displayed Receiver without a WAV and with a five-word WAV at mobile and desktop viewport sizes. Source test suite passes. Direct browser navigation to a real local or deployed URL is restricted in the build environment; Firefox, GitHub Pages cache upgrades and Android hardware remain unverified.
 
-- 50 automated JavaScript tests passed, including pitch preservation over 0.5×–2×, exact composition timing, original PCM immutability, and cue/light separation.
-- Interactive Chromium test using a real five-word WAV: Receiver initialization, focus, Play/Pause, Clean Morse, 0.5× playback and sound-mode switching passed.
-- Interactive Chromium test using a 36-word WAV: all 36 words detected, Word 30 selected, Loop state preserved, and 0.75× original-audio playback passed.
-- A 600 Hz carrier stayed within 8 Hz at tested speed settings; actual playback pitch accuracy must also be checked by ear on devices.
-- A five-word PCM example retained five detectable word regions and 36 tone events after WSOLA stretching at 0.5×, 0.75×, 1.25× and 2×.
-
-### Still required
-
-Firefox, actual deployed GitHub Pages behavior (including old offline caches), Android Studio build/installation, and physical-device audio/visual synchronization. The automated web tests use an inlined module harness due to restricted browser navigation in this build environment.
-
-### Priorities for user testing
-
-1. Update the deployed web files and verify Receiver displays normally, including after refresh.
-2. Play a WAV from the start. Listen for the tiny mechanical cue, then confirm the first **Morse** flare occurs only when the actual Morse tone begins.
-3. Compare 1×, 0.75× and 0.5× for both Original WAV and Clean Morse.
-4. Loop Word 2, turn Loop off, and return to the whole message. Verify start/stop and visual timing.
-5. Confirm Notes, Compose, Library and Android system navigation continue behaving as before.
+**Android:** Version code 24; no functionality changes beyond shared release metadata. Previous Android Receiver behavior is retained. Rebuild APK in Android Studio and sign with the matching update certificate.

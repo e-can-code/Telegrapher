@@ -247,3 +247,11 @@ select{display:block;width:100%;padding:12px;margin-top:12px;border-radius:8px;b
 @media (max-width: 600px) {
   .compose-workspace .actions button { box-sizing: border-box; min-height: 44px; padding-block: 7px; line-height: 1.15; }
 }
+
+/* A name is correspondence metadata, not another large message control. */
+.compose-name{display:flex;align-items:center;gap:7px;min-width:0;max-width:100%;margin:2px 0 0;color:#bfae81;font:12px/1.25 system-ui;letter-spacing:0}
+.compose-name>span{flex:0 0 auto;font-size:13px;color:#c7ab76}
+.compose-name input{min-width:0;width:100%;height:27px;padding:2px 2px 3px;background:transparent;border:0;border-bottom:1px solid #927b505e;border-radius:0;color:#f0dfbd;font:12px system-ui;outline:0;text-overflow:ellipsis}
+.compose-name input::placeholder{color:#a3b59e;opacity:.8}
+.compose-name input:focus{border-color:#e4c68e;box-shadow:0 2px 0 -1px #e4c68e}
+@media(max-height:650px){.compose-name input{height:24px}}

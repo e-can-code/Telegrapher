@@ -52,6 +52,6 @@ test('web package includes Receiver entry and no stale v1.8 cache',()=>{
  const app=readFileSync(new URL('js/app.js',root),'utf8');
  const sw=readFileSync(new URL('sw.js',root),'utf8');
  assert.match(app,/import\('\.\/listen\/quiet-controller\.js'\)/);
- assert.match(sw,/telegrapher-v2\.2/);
+ assert.match(sw,/telegrapher-v2\.3\.1/);
  assert.doesNotMatch(sw,/telegrapher-v1\.8/);
 });

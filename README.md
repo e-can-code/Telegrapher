@@ -1,46 +1,33 @@
-# Telegrapher 2.2 — The Sound Engine
+# Telegrapher 2.3.1 — Receiver web compatibility hotfix
 
-Telegrapher is a local-first Morse correspondence instrument. This edition stabilizes the web Receiver and listening audio without changing the approved Compose, Quiet, Notes, Library, and Celestial Receiver designs.
+This edition restores the complete **Receiver** to the web distribution while preserving Compose message naming, Quiet, Notes, Library, the Living Metal Armillary and the sound engine introduced in 2.2.
 
-## Web edition
+## Running the web app
 
-The `index.html` at the root is the application entry point. The distribution has no build step and uses relative asset paths. To run locally, extract the web ZIP, open a terminal in the extracted folder, then run:
+Extract the entire `Telegrapher_wv2.3.1.zip`. Keep `index.html`, `js/`, and `styles/` together.
 
-```sh
-python -m http.server 8000
-```
+- **Quick preview:** Open `index.html` in a desktop browser. The release now uses a prebuilt classic browser script, so its main controls and Receiver no longer depend on loading ES modules over `file://`. Some browsers restrict local persistent storage; use HTTP for reliable Library functionality.
+- **Recommended local use:** From the extracted directory run `python -m http.server 8000`, then open `http://localhost:8000`.
+- **GitHub Pages:** Copy the **contents** of the extracted web ZIP into the repository's Pages publishing root. `index.html` belongs directly at that root, not inside another version-named folder. All asset URLs are relative.
 
-Open `http://localhost:8000` in Firefox or Chromium. Do not double-click `index.html` to test persistent library storage: browsers restrict JavaScript modules and IndexedDB on local file URLs. For GitHub Pages, publish the **contents** of the web ZIP at the configured publishing root. A v2.2 service worker updates the older offline cache. On an upgraded installation, refresh the page after the new service worker activates if necessary. **Do not delete site storage or Library data** to force an update.
+The distributed website requires **no build step**. `js/telegrapher-bundle.js` is the browser entry point, compiled from the existing `js/` application modules. The original source modules remain in the archive for diagnostics and continued development. Do not replace the bundle with `js/app.js` in the distributed HTML: native ES modules may not load from local file URLs.
 
-## Audio: Original WAV and Clean Morse
+The service worker now uses cache `telegrapher-v2.3.1` and pre-caches the new browser bundle. After replacing an older GitHub Pages version, refresh the page to receive the updated files. **Do not delete site data or IndexedDB to fix a cache issue**; the Library is local to that storage.
 
-Open a recording in Quiet using **Open WAV**, **From Compose**, or Library. The audio-source selector offers:
+## Compose naming
 
-- **Original WAV** (default for imports): the actual imported audio. At changed speeds, a buffered, pitch-preserving WSOLA time-stretch is applied. The source file is not modified. For unusual noisy recordings, listen critically: original-audio stretching is approximate and may retain artifacts.
-- **Clean Morse** (available when tone intervals have been recognized): a newly synthesized signal based on measured dits, dahs, and silence. This is a *reconstruction*, never a replacement for the original WAV. For recordings sent directly from Compose with exact character metadata, Clean Morse is the default and follows exact composition events.
+The optional **Name this message** field becomes the Library title and shared WAV filename. A blank field preserves automatic naming. The title travels from Compose to Listen; clearing the composition clears its name. Message naming and the WAV renderer are unchanged from 2.3.
 
-Speed settings from **0.5× to 2×** change the Morse pace, not the clean signal's pitch. The visible presets are 0.5×, 0.75×, 1×, and 1.25×. Press **Fine** to open the temporary fine-adjustment slider. The Receiver's compact speed button cycles through 0.5×, 0.75×, 1×, 1.25×, 1.5×, and 2×.
+## Listen and Receiver
 
-A quiet, deliberate **mechanical start cue remains enabled by default**. It is audio-only: the firefly and Receiver do not flare for the cue. It can be disabled via the existing `telegrapher-start-cue` local preference if needed. Morse begins after the cue's short audible decay.
+Open a WAV in Quiet (or choose From Compose) and then select Receiver. The ordered, numbered word instruments should appear. Tap a word to focus; double-tap empty space to return. Previous, Play/Pause, Loop, Next, Notes, Original/Clean sound selection, and speed controls remain available. Imported word boundaries are estimated from tone and silence; noisy recordings can be imperfectly segmented.
 
-## Playback and lighting
-
-- Quiet, Receiver, and their controls share a single Web Audio listening transport.
-- The transport owns the source position, region selection, speed, loop, and audio scheduling.
-- The firefly breathes at rest. During active playback, the independently timed breathing stops and only detected Morse tone envelopes produce flares. Silence and the start cue do not.
-- Receiver uses the same light timeline. The ordered word rail shows words chronologically; select one to focus its Living Metal Armillary, and double-tap empty space to return. Previous/Next, Replay, Loop and speed controls remain available.
-- Loop gaps are scheduled in the audio output buffer and do not modify the imported recording or create a false visual Morse event.
-
-Imported word boundaries are inferences from pauses. Do not treat them as automatic translations or guaranteed segmentation. If a recording cannot be decoded, the app should still make full-recording playback available.
+A quiet mechanical start cue is **audio-only**. The firefly and Receiver lights illuminate only Morse tones, never the cue. For speed adjustments, Original WAV uses buffered time-stretch; Clean Morse uses reconstructed events. At different rates the Clean mode preserves the selected pitch and Morse timing relationships.
 
 ## Android Studio edition
 
-Extract the separately provided `Telegrapher_v2.2.zip` and open its Android project directory in Android Studio. After Gradle synchronization, use **Build > Build APK(s)**; the debug APK ordinarily appears in `app/build/outputs/apk/debug/`.
+`Telegrapher_v2.3.1.zip` contains the Android Studio project, with application ID `org.morsecomposer.foundation`, version name `2.3.1` and version code `24`. Extract and open in Android Studio, then use **Build > Build APK(s)**. To update without uninstalling and losing local storage, sign the APK with the same signing key as the installed app. Android retains the ES-module startup that was already functioning; it uses the same application source as the web edition.
 
-The application ID remains `org.morsecomposer.foundation`, version code is **22**, and the version name is `2.2`. To update an installed application without losing local data, sign the new APK with the same key used for the existing installation. Do not uninstall the old app as a workaround. Android's native file opening, file sharing, vibration, WebView, and system-bar handling remain in the thin Android wrapper.
+## Verification and limits
 
-## Verification
-
-Run automated tests from the web directory with `node --test tests/*.test.js` (or `npm test`). The source and browser integration checks are documented in the release notes. Interactive Chromium tests used an inlined, otherwise identical application-module fixture because direct localhost/file navigation is restricted in the build environment. Thus a true GitHub Pages session, Firefox session, Android compilation and physical phone listening remain release acceptance checks, not claimed passes.
-
-Read `CHANGELOG.md`, `RELEASE_NOTES.md`, and `in_next.txt` for the detailed change record and remaining risks.
+Run `node --test tests/*.test.js` to validate application logic. The bundled browser startup has been exercised in Chromium using an inlined fixture at phone and desktop sizes, including importing a five-word WAV into Receiver. The build environment blocks normal browser navigation to localhost and local file URLs, so **actual Firefox, GitHub Pages, file:// and Android installation still require user testing**. See `RELEASE_NOTES.md` and `in_next.txt`.

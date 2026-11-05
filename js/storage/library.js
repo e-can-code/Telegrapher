@@ -18,4 +18,4 @@ export async function putMessage(entry){const old=await getMessage(entry.id);con
   return transact('readwrite',s=>s.put({...old,...entry,createdAt:old?.createdAt||now,updatedAt:now}));}
 export function messageId(){return crypto.randomUUID?.()||`message-${Date.now()}-${Math.random().toString(36).slice(2)}`;}
 
-export async function renameMessage(id,title){const clean=String(title).trim().slice(0,120);if(!clean)throw new Error("A title is required.");const existing=await getMessage(id);if(!existing)throw new Error("Message not found.");await putMessage({id,title:clean});return clean;}
+export async function renameMessage(id,title){const clean=String(title).trim().slice(0,120);if(!clean)throw new Error("A title is required.");const existing=await getMessage(id);if(!existing)throw new Error("Message not found.");await putMessage({id,title:clean,titleMode:'manual'});return clean;}

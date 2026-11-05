@@ -13,6 +13,6 @@ import('./compose/compose-controller.js').catch(error=>console.error('Compose in
 // Android bundles all assets and does not need a browser service worker.
 if('serviceWorker' in navigator && location.hostname!=='appassets.androidplatform.net'){
  window.addEventListener('load',()=>{
-  navigator.serviceWorker.register('./sw.js?v=2.2').then(reg=>reg.update()).catch(error=>console.warn('Offline cache unavailable',error));
+  navigator.serviceWorker.register('./sw.js?v=2.3.1').then(reg=>reg.update()).catch(error=>console.warn('Offline cache unavailable',error));
  });
 }
