@@ -36,7 +36,7 @@ export function stopTone(){
 // Render directly to PCM: no microphone, no noise, no dependence on live timing.
 export function wavFor(chars,wpm,pitch,profileId='classic'){
   const events=eventsFor(chars,wpm),rate=22050;
-  const total=Math.ceil((events.reduce((n,e)=>n+e.seconds,0)+.15)*rate);
+  const total=Math.ceil((events.reduce((n,e)=>n+e.seconds,0)+7*1.2/wpm)*rate);
   const pcm=new Int16Array(total);let pos=0;
   for(const event of events){const count=Math.round(event.seconds*rate);
     if(event.on){const mark=event.seconds>1.8/wpm?'-':'.';

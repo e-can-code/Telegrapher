@@ -1,0 +1,43 @@
+/* Receiver 1.7: full instrument, separate from Quiet's import tools. */
+.listen-workspace .listening-modes{order:0;display:flex;justify-content:center;gap:7px;flex:0 0 auto;margin:0 auto 3px;z-index:2}
+.listening-modes button{width:52px;min-height:40px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;border-radius:13px;border:1px solid #6c795c;background:#102b21;color:#c8d4ba;padding:3px 5px;box-shadow:inset 0 0 12px #0003}
+.listening-modes button span{font-size:18px;line-height:18px;color:#c6af7a}
+.listening-modes button small{font-size:9px;line-height:12px}
+.listening-modes button[aria-pressed=true]{border-color:#d6b77b;background:#31523b;color:#f2e0b6}
+.listen-workspace.receiver-active .foundation-head,.listen-workspace.receiver-active .foundation-speed{display:none!important}
+.listen-workspace.receiver-active .receiver-instrument{flex:1 1 auto;min-height:0;order:3}
+.receiver-instrument{position:relative;isolation:isolate;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;padding:14px 8px 10px!important;border:1px solid #4c6a4a70;border-radius:20px!important;background:radial-gradient(ellipse at 50% 50%,#345d42 0%,#143627 49%,#09251a 100%)!important;box-shadow:inset 0 0 36px #0006;color:#ebd9ae}
+.receiver-instrument[hidden]{display:none!important}
+.receiver-sky{position:absolute;inset:0;pointer-events:none;opacity:.75}.receiver-star{position:absolute;color:#d5ba79;text-shadow:0 0 10px #ebcf91}.star-a{top:10%;left:21%}.star-b{top:17%;right:22%}.star-c{bottom:22%;right:12%}
+.receiver-arc{position:absolute;top:5%;left:8%;width:84%;height:90%;border-top:1px solid #a88d5277;border-radius:50%;pointer-events:none;transform:scaleY(.6)}
+.receiver-title{z-index:1;letter-spacing:.3em;font-family:Georgia,serif;font-size:clamp(12px,3vw,18px);color:#e5d09c;text-align:center;text-shadow:0 0 18px #d7b77b44}
+.receiver-rail{z-index:1;position:relative;width:100%;min-height:115px;display:flex;align-items:center;justify-content:flex-start;gap:clamp(8px,3vw,17px);overflow-x:auto;overflow-y:hidden;padding:18px 13px;scrollbar-width:none;touch-action:pan-x;overscroll-behavior-x:contain}
+.receiver-rail::before{content:'';position:absolute;left:0;right:0;top:50%;height:2px;background:linear-gradient(90deg,transparent,#b99b63 14%,#b99b63 86%,transparent);opacity:.65;pointer-events:none}
+.receiver-rail::-webkit-scrollbar{display:none}
+.receiver-aperture{position:relative;z-index:1;flex:0 0 auto;width:var(--aperture-size);height:calc(var(--aperture-size) + 20px);min-height:86px;border:0!important;border-radius:50%!important;padding:0!important;background:transparent!important;color:#e9d6aa;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;box-shadow:none!important;transform:none!important;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.aperture-bezel{display:grid;place-items:center;width:var(--aperture-size);height:var(--aperture-size);border-radius:50%;background:linear-gradient(135deg,#f2dca1 0%,#8d6a35 24%,#e4bf76 47%,#5c492c 73%,#e0be7c 100%);box-shadow:0 6px 13px #0008,0 0 0 2px #493c27,inset 0 0 0 2px #ead5a4;transition:transform .22s,filter .22s,box-shadow .22s}
+.aperture-lens{display:grid;place-items:center;position:relative;width:82%;height:82%;border-radius:50%;border:2px solid #6d8d6e;background:radial-gradient(circle,#4a7452 0%,#234b37 28%,#0c2c20 80%);box-shadow:inset 0 0 18px #000b,0 0 8px #e6c88b44}
+.aperture-rings{position:absolute;inset:16%;border:1px solid #d2bd85aa;border-radius:50%;box-shadow:0 0 0 10px #b3b68c22,inset 0 0 8px #d2c08944}
+.aperture-core{width:9px;height:9px;border-radius:50%;background:#f6e7bf;box-shadow:0 0 12px 4px #f1d6a68c}
+.receiver-aperture[aria-pressed=true]{z-index:3}
+.receiver-aperture[aria-pressed=true] .aperture-bezel{transform:scale(1.14) translateY(-4px);filter:brightness(1.2);box-shadow:0 10px 20px #0009,0 0 26px #e5c68755,inset 0 0 0 2px #f3e1b5}
+.receiver-aperture[aria-pressed=true] .aperture-core{box-shadow:0 0 18px 9px #f2d8a7b3}
+.aperture-number{font:10px Georgia,serif;letter-spacing:.12em;color:#b8c5aa}
+.receiver-ornament{color:#c8aa71;letter-spacing:.65em;font-size:11px;opacity:.8}
+.receiver-meta{color:#c7d3b6;font-size:10px;letter-spacing:.07em;text-align:center}
+.receiver-foot{display:flex;gap:10px;justify-content:center;align-items:center;z-index:2}
+.receiver-foot button{min-width:40px;min-height:40px;border-radius:50%;border:1px solid #b49a67;background:radial-gradient(circle at 40% 30%,#345b42,#16392a);color:#e9d3a2;font-size:22px;box-shadow:inset 0 0 0 3px #1b3929,0 3px 7px #0005}
+.receiver-foot button:active{background:#486b4c;box-shadow:0 0 12px #d5b77777}
+.receiver-empty{margin:auto;color:#b9c9ac;font:italic 13px Georgia,serif;text-align:center;z-index:1}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+@media(max-width:600px){.receiver-instrument{padding:8px 4px!important;gap:5px}.receiver-rail{padding:10px 11px;min-height:100px}.receiver-foot button{min-width:38px;min-height:38px}.listen-workspace.receiver-active.notes-open .receiver-instrument{flex:0 0 105px!important;height:105px!important}.listen-workspace.receiver-active.notes-open .receiver-arc,.listen-workspace.receiver-active.notes-open .receiver-ornament,.listen-workspace.receiver-active.notes-open .receiver-meta,.listen-workspace.receiver-active.notes-open .receiver-foot{display:none}.listen-workspace.receiver-active.notes-open .receiver-rail{min-height:60px;padding:0 12px}.listen-workspace.receiver-active.notes-open .receiver-aperture{--aperture-size:48px!important;height:58px;min-height:58px}}
+@media(prefers-reduced-motion:reduce){.aperture-bezel{transition:none}}
+/* The import row belongs only to Quiet; the receiver owns the available field. */
+.listen-workspace.receiver-active .foundation-head{display:none!important}
+.listen-workspace.receiver-active .foundation-speed{display:none!important}
+.listen-workspace.receiver-active .receiver-instrument{order:3}
+.listen-workspace.receiver-active .foundation-transport{order:4}
+.listen-workspace.receiver-active .foundation-bottom{order:5}
+.listen-workspace.receiver-active #listenNotesPanel{order:6}
+.listen-workspace.receiver-active #listenSoundPanel{order:7}
+@media(max-width:600px){.listen-workspace.receiver-active .receiver-instrument{min-height:0!important}.listen-workspace.receiver-active .listening-modes{flex-shrink:0}}

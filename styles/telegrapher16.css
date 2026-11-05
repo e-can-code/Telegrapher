@@ -1,0 +1,44 @@
+/* Two listening instruments share Quiet's transport and recording identity.
+   A mode switch changes presentation, never the loaded recording. */
+.listening-modes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;order:1;flex:0 0 auto}
+.listening-modes button{background:#17372a;border:1px solid #49694f;color:#c7d3b9;border-radius:9px;padding:8px 3px;min-width:0;font:inherit;font-size:12px;cursor:pointer}
+.listening-modes button[aria-pressed="true"]{background:#31533c;border-color:#d6b777;color:#f3dfb5;box-shadow:inset 0 0 14px #e1c58915}
+.listen-workspace .foundation-speed{order:2}
+.listen-workspace .foundation-stage{order:3}
+.listen-workspace .advanced-instrument{order:3;flex:1 1 0;min-height:0}
+.listen-workspace .foundation-transport{order:4}
+.listen-workspace .foundation-bottom{order:5}
+.listen-workspace #listenNotesPanel{order:6}
+.listen-workspace #listenSoundPanel{order:7}
+.listen-workspace #listenError{order:8}
+.listen-workspace .listen-privacy{order:9}
+.advanced-instrument{position:relative;overflow:hidden;isolation:isolate;background:radial-gradient(ellipse at 50% 48%,#2b503b,#123225 73%,#0c291e);border-radius:18px;display:flex;flex-direction:column;padding:15px;gap:12px;color:#e8d6ab}
+.advanced-instrument[hidden]{display:none!important}
+.instrument-eyebrow{font-size:10px;letter-spacing:.16em;color:#e1c58e;display:flex;justify-content:space-between;gap:10px;align-items:center}
+.instrument-eyebrow span{font-size:10px;letter-spacing:0;color:#adc5ad;text-align:right}
+.receiver-words{display:flex;align-items:center;gap:10px;flex:1;min-height:72px;overflow-x:auto;overscroll-behavior-x:contain;padding:14px 5px;scrollbar-width:thin}
+.receiver-word{position:relative;flex:0 0 auto;min-width:66px;height:90px;padding:10px 12px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:9px;border:1px solid #789278;border-radius:30px 18px 30px 18px;background:linear-gradient(145deg,#33543d,#1b392c 70%);color:#d9d1aa;box-shadow:inset 0 0 0 4px #18372a,inset 0 0 0 5px #8e9d7044;cursor:pointer;transition:background .18s,border-color .18s,transform .18s,box-shadow .18s}
+.receiver-word[aria-pressed="true"]{transform:translateY(-3px);border-color:#e9d09b;background:radial-gradient(ellipse at 50% 55%,#547251,#2b4935);box-shadow:inset 0 0 0 4px #18372a,inset 0 0 0 5px #d2b87a77,0 0 26px #e6c98c33}
+.receiver-glyph{letter-spacing:3px;font-size:20px;color:#f0dcaf;text-shadow:0 0 11px #dfc48a80}
+.receiver-word small{font-size:10px;color:#a9c4a8}
+.receiver-actions{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
+.receiver-actions button{min-height:38px;border:1px solid #789174;border-radius:9px;background:#284b37;color:#e9d7ac;padding:6px 12px;font:inherit;font-size:12px}
+.receiver-hint,.living-caption{color:#b2c4ad;font-size:11px;line-height:1.4;text-align:center}
+.living-instrument{padding:12px}
+#livingCanvas{display:block;width:100%;flex:1;min-height:60px;touch-action:pan-y}
+@media(max-width:600px){
+ .listen-workspace .listening-modes{gap:4px}
+ .listening-modes button{min-height:31px;padding:5px 2px;font-size:11px}
+ .advanced-instrument{padding:9px;gap:6px}
+ .receiver-word{min-width:54px;height:68px;padding:7px}
+ .receiver-words{min-height:55px;padding:6px 2px}
+ .receiver-actions button{min-height:32px;padding:4px 8px;font-size:11px}
+ .receiver-hint,.living-caption{font-size:10px}
+ .listen-workspace.notes-open .advanced-instrument{flex:0 0 76px!important;height:76px!important;min-height:0!important;padding:6px}
+ .listen-workspace.notes-open .receiver-words{min-height:25px;padding:0}
+ .listen-workspace.notes-open .receiver-word{height:38px;min-width:42px;border-radius:16px}
+ .listen-workspace.notes-open .receiver-glyph{font-size:12px}
+ .listen-workspace.notes-open .receiver-word small,.listen-workspace.notes-open .receiver-hint,.listen-workspace.notes-open .living-caption,.listen-workspace.notes-open .receiver-actions,.listen-workspace.notes-open .instrument-eyebrow{display:none}
+ body.native-notes-keyboard .listen-workspace .advanced-instrument,body.native-notes-keyboard .listen-workspace .listening-modes{display:none!important}
+}
+@media(prefers-reduced-motion:reduce){.receiver-word{transition:none}}

@@ -1,19 +1,25 @@
-# Telegrapher 1.3 — Release notes and device acceptance
+# Telegrapher 2.2 — Release candidate
 
-## Release purpose
-Mobile viewport ownership and stable transitions between listening and transcription. This release does not add Signal or Detail.
+**Main objective:** Make Morse audio and illumination behave as one predictable instrument. The mechanical cue remains audio-only; it never drives a Morse light flare.
 
-## Manual acceptance on Android
-1. Open Compose: header, message, Gathering Light, Play and Share Audio are visible above the system navigation bar.
-2. Compose HI, play it, confirm the strip returns to its first tile before playback; confirm WAV export still works.
-3. Open Listen with no recording, then import a WAV. Confirm the firefly and all transport controls fit without scrolling.
-4. Start playback, open Notes, and confirm the compact field does not overlap playback or the Brass Helmsman.
-5. Confirm the audio does not pause, restart, seek, or change speed when Notes opens/closes.
-6. Use Dit, Dah, Space and Backspace; the Android keyboard must remain closed.
-7. Tap the writing surface: verify Play/Pause and Back 3 Seconds remain visible above the keyboard; text can scroll within Notes.
-8. Close the keyboard, then Notes: expanded Quiet should return without overlap or unwanted scrolling.
-9. Reopen the recording from Library; verify its notes persist across app restart.
-10. Test on both a short and a tall Android viewport, including a phone with three-button navigation if available.
+Web: extract `Telegrapher_wv2.2.zip` and publish its contents, with `index.html` at the root. Android: extract `Telegrapher_v2.2.zip`, open in Android Studio, and build an APK. Source is matched across the two editions.
 
-## Known verification gaps
-Browser automation was attempted but blocked by the runtime. Android SDK and Gradle are unavailable here, so no APK was compiled. Real Android keyboard behavior remains unverified. The current build should be treated as a release candidate until the above tests pass.
+### Verification completed
+
+- 50 automated JavaScript tests passed, including pitch preservation over 0.5×–2×, exact composition timing, original PCM immutability, and cue/light separation.
+- Interactive Chromium test using a real five-word WAV: Receiver initialization, focus, Play/Pause, Clean Morse, 0.5× playback and sound-mode switching passed.
+- Interactive Chromium test using a 36-word WAV: all 36 words detected, Word 30 selected, Loop state preserved, and 0.75× original-audio playback passed.
+- A 600 Hz carrier stayed within 8 Hz at tested speed settings; actual playback pitch accuracy must also be checked by ear on devices.
+- A five-word PCM example retained five detectable word regions and 36 tone events after WSOLA stretching at 0.5×, 0.75×, 1.25× and 2×.
+
+### Still required
+
+Firefox, actual deployed GitHub Pages behavior (including old offline caches), Android Studio build/installation, and physical-device audio/visual synchronization. The automated web tests use an inlined module harness due to restricted browser navigation in this build environment.
+
+### Priorities for user testing
+
+1. Update the deployed web files and verify Receiver displays normally, including after refresh.
+2. Play a WAV from the start. Listen for the tiny mechanical cue, then confirm the first **Morse** flare occurs only when the actual Morse tone begins.
+3. Compare 1×, 0.75× and 0.5× for both Original WAV and Clean Morse.
+4. Loop Word 2, turn Loop off, and return to the whole message. Verify start/stop and visual timing.
+5. Confirm Notes, Compose, Library and Android system navigation continue behaving as before.

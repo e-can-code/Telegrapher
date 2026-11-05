@@ -81,7 +81,7 @@ function queueLibrarySave(){
   clearTimeout(librarySaveTimer);
   if(!state.chars.length)return;
   const chars=message.copy(state.chars),title=textOf(chars).trim().slice(0,55)||'Untitled composition';
-  librarySaveTimer=setTimeout(()=>{void putMessage({id:libraryDraftId,kind:'composed',title,chars,audio:wavFor(chars,state.speed,state.pitch,state.soundProfile)}).then(()=>document.dispatchEvent(new Event('morse:library-updated'))).catch(console.warn);},450);
+  librarySaveTimer=setTimeout(()=>{void putMessage({id:libraryDraftId,kind:'composed',title,chars,audio:wavFor(chars,state.speed,state.pitch,state.soundProfile),morseMeta:{chars,wpm:state.speed,pitch:state.pitch,soundProfile:state.soundProfile}}).then(()=>document.dispatchEvent(new Event('morse:library-updated'))).catch(console.warn);},450);
 }
 document.addEventListener('morse:library-open-compose',event=>{cancelBoundaryTimer();stop();state.chars=message.copy(event.detail.chars||[]);libraryDraftId=event.detail.id;try{sessionStorage.setItem('morse-library-draft-id',libraryDraftId);}catch{}readyToSave=true;render();});
 function render(){
@@ -282,7 +282,7 @@ const previousDraft=loadDraft();$('resumeBtn').hidden=!previousDraft.length;rend
 document.addEventListener('morse:request-export', event => {
   const {accept, reject} = event.detail || {};
   if (!state.chars.length) { reject?.('Compose a message first, or open a WAV.'); return; }
-  try { accept?.(wavFor(state.chars, state.speed, state.pitch, state.soundProfile)); }
+  try { accept?.(wavFor(state.chars, state.speed, state.pitch, state.soundProfile), {chars:state.chars.map(c=>({...c})),wpm:state.speed,pitch:state.pitch,soundProfile:state.soundProfile}); }
   catch (error) { reject?.(error.message || 'Unable to export this composition.'); }
 });
 function announceComposeAvailability() {

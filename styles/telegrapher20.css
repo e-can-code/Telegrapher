@@ -1,0 +1,24 @@
+/* A stable ordered word rail is the Receiver's primary navigation surface. */
+#receiverCanvas {touch-action:pan-y;}
+.foundation-light {
+  --firefly-glow:.25;--firefly-scale:1;
+  animation:none !important;
+  transform:translate(-50%,-50%) scale(var(--firefly-scale));
+  transition:none;
+}
+
+/* Explicit audio provenance without claiming that a reconstructed WAV is original. */
+.listen-audio-mode{display:flex;align-items:center;justify-content:flex-start;gap:5px;margin-top:4px;color:#b8c8b1;font:10px system-ui;letter-spacing:.02em}
+.listen-audio-mode span{margin-right:5px}
+.listen-audio-mode button{border:1px solid #8f9a7666;border-radius:6px;background:#1e3b2a;color:#decba6;min-height:27px;padding:3px 9px;font:10px system-ui}
+.listen-audio-mode button[aria-pressed=true]{background:#d9c18a;color:#142a1e;border-color:#efdbb0}
+.listen-audio-mode button:disabled{opacity:.42}
+#receiverAudioMode{background:#203e2e;color:#e0cb98;border:1px solid #977d4c88;border-radius:6px;padding:4px 7px;min-height:25px;white-space:nowrap;font:10px system-ui}
+#receiverAudioMode:disabled{opacity:.55}
+@media(max-width:380px){.listen-audio-mode button{padding:3px 6px}.receiver-readout-bottom{gap:5px;font-size:8px}}
+
+.foundation-speed-head{display:flex;align-items:center;gap:8px}
+.foundation-speed-head output{margin-left:auto}
+#listenFineToggle{font:10px system-ui;color:#dfc897;background:#244535;border:1px solid #99845699;border-radius:6px;min-height:28px;padding:3px 10px}
+#listenFineToggle[aria-expanded=true]{background:#d9c18a;color:#112b1d}
+#listenSpeedFine[hidden]{display:none!important}

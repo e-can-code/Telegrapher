@@ -1,7 +1,19 @@
-Telegrapher 1.5 follow-up
-1. Verify haptic contact and threshold timing on at least two physical Android phones. Vibration strength varies by hardware; adjust durations based on testers' comfort.
-2. Verify that the device's vibration-off / accessibility preferences are honored by the OS.
-3. Listen critically to live versus exported WAV across all sound profiles; current live synthesis is improved but sample-based sound design remains future work.
-4. Re-test Compose bottom buttons against three-button Android navigation and keyboard insets.
-5. Verify Compose -> Listen -> Library and Notes persistence across Android updates.
-6. Check web fallback on Firefox/Chrome and verify that no vibration support is handled silently.
+Telegrapher 2.2 — Outstanding tasks and rationale
+
+P0 — Verify Receiver on the deployed GitHub Pages URL, especially browsers that previously loaded Telegrapher 2.0/2.1. The blank web Receiver was reported in production, but the build environment could only exercise an inlined browser harness. Confirm service-worker upgrade and that app imports resolve under the real site path.
+
+P0 — Compile and install Android APK through Android Studio, with the signing key used for earlier releases. Verify native file intent opening, sharing, haptics, navigation-bar clearance, and local Library preservation. These cannot be certified from source checks alone.
+
+P0 — Evaluate speaker and Bluetooth-output light synchronization on physical Android phones. AudioContext.getOutputTimestamp() improves the time reference, but device-specific acoustic/display latency remains uncertain; do not add a global fixed delay without measurements.
+
+P1 — Audition original-source WSOLA slowdown on noisy/weak radio WAVs. It is buffered and pitch-preserving on controlled tests but may exhibit artifacts with broadband noise or irregular operators. If needed, replace with a tested higher-quality offline stretcher while retaining Original and Clean modes.
+
+P1 — Tune the optional mechanical cue character and spacing by ear, preserving its audio-only semantics.
+
+P1 — Evaluate long (multi-minute) imported WAV processing on low-powered Android devices. Consider audio transformation in a Web Worker and bounded cache memory if UI stalls while preparing.
+
+P1 — Improve imported-signal pitch estimation for Clean Morse and add user-controlled pitch/source profile. The present reconstruction defaults to a classic 600 Hz carrier unless Compose metadata is available.
+
+P2 — Add adjustable audio-to-visual calibration only if physical-device measurements establish a consistent offset; avoid decorative false Morse flares.
+
+P2 — Continue the correspondence archive and Library redesign as a separate workstream. Do not destabilize this audio stabilization release with unrelated UI architecture changes.
