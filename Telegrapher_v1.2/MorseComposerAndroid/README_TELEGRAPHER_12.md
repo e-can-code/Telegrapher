@@ -1,1 +1,0 @@
-Telegrapher 1.2 Android Studio project. Open MorseComposerAndroid in Android Studio and build debug APK. Core is mirrored verbatim from Telegrapher_Core_v1.2. App ID remains unchanged for update compatibility. This is an Android Studio source project, not a precompiled APK.\n

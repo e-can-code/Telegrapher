@@ -1,3 +1,0 @@
-Foundation 0.3: Verify Compose backspace on trailing pending space, internal word boundary, and final letter after a word boundary. Verify audio-following highlight and scroll-to-start on Android. Verify speed above firefly, transport below, notes keyboard resizing. Preserve quiet-only Listen.
-
-Foundation 0.4: Check Android press highlight removal on the actual device, especially touch focus versus keyboard focus. Confirm Clear empties the entire composition and remains undoable; confirm library archiving of prior draft is intentional. Confirm the five editing controls fit on narrow phones.

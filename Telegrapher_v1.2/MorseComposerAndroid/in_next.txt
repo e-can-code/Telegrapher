@@ -1,5 +1,0 @@
-Foundation 0.5 validation:
-- Verify adaptive icon masks on launcher and icon legibility at 48dp.
-- Check bottom navigation clearance on gesture and three-button navigation.
-- Confirm Play/Share still comfortable to tap and Compose does not scroll unexpectedly.
-- Preserve Compose visuals; discuss Listen separately before any new changes.

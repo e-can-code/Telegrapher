@@ -1,1 +1,0 @@
-Foundation 0.3: Compose backspace boundary semantics; audio-clock synchronized tile playback highlighting; Quiet speed controls above firefly, transport below. Open this folder in Android Studio and build APK. Android phone interaction and audio playback require physical verification.
