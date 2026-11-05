@@ -1,0 +1,104 @@
+/* Telegrapher 1.3: viewport-owned layout. Shared by browser and Android WebView. */
+:root { --tg-safe-bottom: env(safe-area-inset-bottom, 0px); --tg-safe-top: env(safe-area-inset-top, 0px); }
+html { height:100%; }
+body { min-height:100%; overflow-x:hidden; }
+.app { min-height:100dvh; }
+@media(max-width:600px) {
+  html,body { height:100%; }
+  body { overflow:hidden; }
+  .app {
+    height:100dvh; min-height:0; max-height:100dvh;
+    padding: max(8px,var(--tg-safe-top)) 10px max(13px,var(--tg-safe-bottom));
+    gap:5px; overflow:hidden;
+  }
+  .app>header { min-height:32px; flex:0 0 auto; }
+  .app>.workspace-nav { flex:0 0 auto; }
+  .compose-workspace { flex:1 1 0; min-height:0; overflow:hidden; gap:5px; }
+  .compose-workspace .message { flex:0 0 auto; min-height:0; padding:10px; }
+  .compose-workspace .tiles { min-height:48px; padding:6px 0 4px; }
+  .compose-workspace .instrument { flex:1 1 0; min-height:0; overflow:hidden; }
+  .compose-workspace .key { width:min(66vw, 270px, 43dvh); height:min(66vw, 270px, 43dvh); min-width:0; min-height:0; aspect-ratio:1; flex-shrink:0; }
+  .compose-workspace .actions { flex:0 0 auto; margin-bottom:0; padding-bottom:2px; gap:7px; }
+  .compose-workspace .actions button { min-height:44px; padding:8px 4px; }
+  .listen-workspace {
+    flex:1 1 0; min-height:0; height:100%; overflow:hidden;
+    display:flex; flex-direction:column; gap:5px;
+  }
+  .listen-workspace .foundation-head { flex:0 0 auto; order:0; }
+  .listen-workspace .foundation-speed {
+    order:1; flex:0 0 auto!important; display:flex; flex-direction:column;
+    width:100%; min-width:0; max-width:none; margin:0!important; padding:0!important; gap:1px;
+  }
+  .listen-workspace .foundation-speed-head { line-height:15px; }
+  .listen-workspace .foundation-speed input[type=range] { margin:0; height:18px; }
+  .listen-workspace .foundation-presets { margin:0; }
+  .listen-workspace .foundation-stage {
+    order:2; flex:1 1 0!important; min-height:0!important; max-height:none;
+    height:auto!important; margin:0!important; position:relative;
+    overflow:hidden; border-radius:17px; transition:border-radius .22s ease;
+  }
+  .listen-workspace .foundation-console { order:3; display:block!important; flex:0 0 auto; }
+  .listen-workspace .foundation-transport { display:flex; justify-content:center; gap:7px; }
+  .listen-workspace .foundation-bottom { order:4; flex:0 0 auto; min-height:36px; }
+  .listen-workspace #listenNotesPanel { order:5; }
+  .listen-workspace #listenSoundPanel { order:6; }
+  .listen-workspace #listenError { order:7; }
+  .listen-workspace .listen-privacy { order:8; }
+  .listen-workspace.notes-open .foundation-stage {
+    flex:0 0 clamp(76px, 13dvh, 116px)!important;
+    height:clamp(76px, 13dvh, 116px)!important;
+    min-height:0!important;
+  }
+  .listen-workspace.notes-open #listenNotesPanel {
+    flex:1 1 0; min-height:0!important; overflow:hidden;
+    display:flex; flex-direction:column; gap:5px; padding:2px 0 4px;
+  }
+  .listen-workspace.notes-open #listenNotesPanel[hidden] { display:none!important; }
+  .listen-workspace .brass-notes .foundation-note-head { flex:0 0 auto; padding:0 2px 2px; }
+  .listen-workspace .brass-helmsman { flex:0 0 auto; margin:0!important; padding:5px!important; border-radius:18px; }
+  .listen-workspace .brass-pair { padding:4px; gap:5px; }
+  .listen-workspace .brass-primary { min-height:clamp(50px, 9dvh, 72px)!important; }
+  .listen-workspace .brass-support { margin-top:5px; gap:5px; }
+  .listen-workspace .brass-support .brass-key { min-height:38px; }
+  .listen-workspace .brass-notes textarea {
+    flex:1 1 0; min-height:52px!important; height:auto; max-height:none;
+    resize:none; overflow-y:auto; overscroll-behavior:contain;
+    padding:10px 8px;
+  }
+  .listen-workspace .brass-hide-keys { flex:0 0 auto; margin:0 0 0 auto; padding:3px 7px; }
+  /* The keyboard-open mode retains transport and writing, with no page-wide scrolling. */
+  body.native-notes-keyboard .listen-workspace .foundation-head,
+  body.native-notes-keyboard .listen-workspace .foundation-speed,
+  body.native-notes-keyboard .listen-workspace .foundation-stage,
+  body.native-notes-keyboard .listen-workspace .brass-helmsman { display:none!important; }
+  body.native-notes-keyboard .listen-workspace { overflow:hidden; }
+  body.native-notes-keyboard .listen-workspace .foundation-console { flex:0 0 auto; }
+  body.native-notes-keyboard .listen-workspace .foundation-bottom { flex:0 0 auto; }
+  body.native-notes-keyboard .listen-workspace #listenNotesPanel { flex:1 1 0; min-height:0; }
+  body.native-notes-keyboard .listen-workspace #listenNotesText { min-height:50px!important; }
+  body.native-notes-keyboard .app { height:var(--tg-visual-height,100dvh); max-height:var(--tg-visual-height,100dvh); }
+  body.native-notes-keyboard .app>header,body.native-notes-keyboard .app>.workspace-nav { flex-shrink:0; }
+}
+@media(max-width:600px) and (max-height:650px) {
+ .app { padding-top:5px; gap:3px; }
+ .compose-workspace .message { padding:7px; }
+ .compose-workspace .key { width:min(58vw, 34dvh); height:min(58vw, 34dvh); }
+ .listen-workspace.notes-open .foundation-stage { flex-basis:65px!important; height:65px!important; }
+ .listen-workspace .brass-primary { min-height:48px!important; }
+}
+@media(prefers-reduced-motion:reduce) {
+ .listen-workspace .foundation-stage { transition:none; }
+}
+/* Older Foundation rules permitted page scrolling while Notes was open. This
+   override makes the app shell own height and the textarea own text overflow. */
+@media(max-width:600px){
+ body.notes-writing { overflow:hidden!important; }
+ body.notes-writing .app { height:100dvh; min-height:0; max-height:100dvh; overflow:hidden; }
+ body.native-notes-keyboard.notes-writing .app { height:var(--tg-visual-height,100dvh); max-height:var(--tg-visual-height,100dvh); }
+ .listen-workspace .foundation-speed-head label { margin:0!important; padding:0; line-height:15px; }
+ .listen-workspace .foundation-actions label { margin:0!important; }
+ .listen-workspace .foundation-stage .foundation-empty label { margin:0!important; }
+ .listen-workspace .foundation-transport .listen-btn { flex-shrink:0; }
+ .listen-workspace .foundation-bottom>div:first-child { min-width:0; overflow:hidden; }
+ .listen-workspace #listenName { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+}

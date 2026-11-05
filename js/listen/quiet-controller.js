@@ -64,12 +64,12 @@ export function initQuiet(){
  function captureCaret(){notesCaret=noteArea.selectionStart;notesEnd=noteArea.selectionEnd;}
  function positionWriting(){
   if($('listenNotesPanel').hidden)return;
-  const viewport=window.visualViewport;
-  const bottom=viewport?viewport.offsetTop+viewport.height:window.innerHeight;
-  const controls=$('listenPlay').getBoundingClientRect();
-  const area=noteArea.getBoundingClientRect();
-  // Keep transport and the writing surface together when Android's keyboard is visible.
-  if(area.bottom>bottom-12)window.scrollBy({top:Math.min(area.bottom-bottom+18,Math.max(0,controls.top-12)),behavior:'smooth'});
+  // Keep the instrument stationary; the Notes textarea owns its own scrolling.
+  // On Android, VisualViewport reports the space left after the IME appears.
+  if(document.body.classList.contains('native-notes-keyboard')){
+    const v=window.visualViewport;
+    if(v)document.documentElement.style.setProperty('--tg-visual-height',`${Math.round(v.height)}px`);
+  }
  }
  $('listenNotesToggle').addEventListener('click',()=>{
   const panel=$('listenNotesPanel');panel.hidden=!panel.hidden;
@@ -80,12 +80,12 @@ export function initQuiet(){
   if(opened){noteKeys.hidden=false;$('listenNotesKeyboard').setAttribute('aria-expanded','true');
     // No focus here: opening Notes must not summon the Android keyboard.
     requestAnimationFrame(positionWriting);
-  } else {noteArea.blur();window.scrollTo({top:0,behavior:'smooth'});}
+  } else {noteArea.blur();document.body.classList.remove('native-notes-keyboard');document.documentElement.style.removeProperty('--tg-visual-height');}
  });
  noteArea.addEventListener('input',()=>{captureCaret();clearTimeout(notesTimer);notesTimer=setTimeout(()=>void saveNotes(),250);});
  for(const eventName of ['click','keyup','select'])noteArea.addEventListener(eventName,captureCaret);
  noteArea.addEventListener('focus',()=>{document.body.classList.add('native-notes-keyboard');setTimeout(positionWriting,180);setTimeout(positionWriting,420);});
- noteArea.addEventListener('blur',()=>document.body.classList.remove('native-notes-keyboard'));
+ noteArea.addEventListener('blur',()=>{document.body.classList.remove('native-notes-keyboard');document.documentElement.style.removeProperty('--tg-visual-height');});
  window.visualViewport?.addEventListener('resize',positionWriting);
  $('listenNotesKeyboard').addEventListener('click',()=>{noteKeys.hidden=!noteKeys.hidden;$('listenNotesKeyboard').textContent=noteKeys.hidden?'Show keys ⌃':'Hide keys ⌄';$('listenNotesKeyboard').setAttribute('aria-expanded',String(!noteKeys.hidden));});
  document.querySelectorAll('[data-note]').forEach(b=>{
