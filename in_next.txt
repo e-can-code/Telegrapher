@@ -1,8 +1,0 @@
-FOUNDATION 0.1 — NEXT
-- Confirm in Firefox and Android: Compose -> From Compose -> Quiet -> Play -> Library -> reopen -> notes restore.
-- Test multiple generated WAVs and external WAVs; verify exported bytes equal the From Compose import.
-- Verify IndexedDB storage and browser storage failure messaging.
-- Confirm Library rename/delete and composed message restoration across reloads.
-- Verify touch seeking at the line endpoints and playback state transitions.
-- Preserve Compose Gathering Light and Quiet firefly while fixing any regressions.
-- Do not restore Signal or Detail until the foundation passes browser-level tests.
