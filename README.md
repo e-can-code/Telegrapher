@@ -1,0 +1,1 @@
+Telegrapher 1.2 shared application core. This directory is the source of truth for browser and Android. Run with python -m http.server 8000. The Android wrapper packages the same files in assets/www.\n
