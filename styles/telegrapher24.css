@@ -1,0 +1,15 @@
+/* Receiver 2.4: preserve the established brass transport and its placement. */
+.receiver-speed-wrap{position:relative;pointer-events:auto}
+.receiver-speed-menu[hidden]{display:none!important}
+.receiver-speed-menu{position:absolute;right:0;bottom:calc(100% + 7px);z-index:15;display:grid;grid-template-columns:repeat(3,minmax(42px,1fr));gap:4px;padding:7px;background:#132e22f5;border:1px solid #bba273;border-radius:9px;box-shadow:0 7px 25px #0008;min-width:150px}
+.receiver-speed-menu button{font:inherit;color:#e9d5a5;background:#294c38;border:1px solid #aa916c75;border-radius:6px;min-height:35px;cursor:pointer}
+.receiver-speed-menu button:hover,.receiver-speed-menu button:focus-visible{background:#43654b;outline:1px solid #e5c98c}
+.note-edit-surface{position:relative;min-height:0}
+.note-edit-surface textarea{width:100%;box-sizing:border-box}
+.notes-touch-caret{position:absolute;z-index:3;left:10px;top:10px;width:24px;height:35px;transform:translate(-11px,-4px);touch-action:none;cursor:grab;outline:0;display:flex;align-items:center;flex-direction:column;pointer-events:auto}
+.notes-touch-caret:active{cursor:grabbing}
+.notes-caret-stem{width:2px;height:21px;background:#f2d08c;box-shadow:0 0 8px #f0c87b8a}
+.notes-caret-grip{width:15px;height:10px;background:#d7b36f;border:1px solid #ffe5ad;border-radius:2px 2px 7px 7px;box-shadow:0 0 7px #f4d69d75}
+.notes-bottom-actions{display:flex;align-items:center;justify-content:flex-end;gap:5px}
+.notes-bottom-actions>button:not(.brass-hide-keys){border:0;background:transparent;color:#d9b874;font-size:18px;line-height:1;padding:3px 5px;min-width:25px;min-height:27px;cursor:pointer}
+.notes-bottom-actions .brass-hide-keys{margin:0!important;font-size:11px}

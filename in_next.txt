@@ -1,9 +1,7 @@
-Telegrapher 2.3.1 — outstanding verification and follow-up
+Telegrapher 2.5 follow-up
 
-P0 — Confirm the distributed web ZIP displays Receiver in Firefox on the user's machine. Test extracting the full directory, double-clicking index.html, and launching the same files through localhost/GitHub Pages. Report the browser and whether the page is opened using file:// or https:// if problems persist. The bundle removes relative module loading but actual Firefox could not be run here.
-P0 — Verify an existing GitHub Pages installation upgrades its service worker to telegrapher-v2.3.1 while preserving IndexedDB/Library data. If a stale page appears, refresh rather than deleting site data.
-P0 — Build the Android Studio project, install the APK signed with the existing key, and confirm Compose naming and Receiver still work.
-P1 — Run physical-device audio and light synchronization tests on Quiet/Receiver. The mechanical start cue must be audible but never cause a signal flare.
-P1 — Test original and clean Morse at 0.5x, 0.75x and 1x, including looping, seeking and word changes.
-P1 — Test long messages, poor-quality WAVs, Notes, Library restores, and Compose->Listen transfer after upgrading.
-P2 — Keep the web classic bundle and canonical ES module sources synchronized in subsequent releases. The browser bundle must be regenerated whenever source modules change, and the offline cache version must increase.
+- Confirm Restart Word and Next Word on physical Android hardware, including rapid taps and the final word.
+- Verify the Golden Return occurs precisely at loop completion and does not resemble a Morse tone.
+- Test both whole-recording and focused-word looping with long trailing silences.
+- Recheck browser service-worker upgrades and Firefox playback.
+- Preserve the existing brass controls and their Android system-navigation clearance.

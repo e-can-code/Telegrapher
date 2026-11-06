@@ -204,7 +204,8 @@ export class CelestialReceiver {
     line.addColorStop(0,'rgba(199,171,109,0)');line.addColorStop(.15,'rgba(199,171,109,.22)');line.addColorStop(.85,'rgba(199,171,109,.22)');line.addColorStop(1,'rgba(199,171,109,0)');
     ctx.strokeStyle=line;ctx.lineWidth=.7;ctx.beginPath();ctx.moveTo(left,baseY);ctx.lineTo(right,baseY);ctx.stroke();
     for(let i=first;i<last;i++){
-      const x=left+spacing*(i-this.railOffset+.5);
+      const railLeft=n<=5?(w-n*spacing)/2:left;
+      const x=railLeft+spacing*(i-this.railOffset+.5);
       if(x<12||x>w-12)continue;
       const isActive=active===i,selected=this.scope.queued===i;
       const r=Math.min(30,Math.max(18,spacing*.31));
@@ -259,6 +260,25 @@ export class CelestialReceiver {
     drawFullArmillary(ctx,cx,cy,S,this.t,this.signatures[index]||{ratio:.34,density:.5},bright,this.reduced?42:56);
     this.hits.push({kind:'center',index,x:cx,y:cy,radius:S*.96});
   }
+  drawLoopReturn(playback){
+    const age=playback.loopCompletionAge;
+    if(!(age>=0&&age<.72))return;
+    const ctx=this.ctx,focus=this.scope.view==='focus';
+    let x=this.w*.5,y=this.h*.46,r=Math.min(this.w*.33,this.h*.34,235);
+    if(!focus){
+      const current=this.scope.wordAt(Math.max(0,this.scope.interval().end-.001));
+      const hit=this.hits.find(h=>h.kind==='word'&&h.index===current);
+      if(!hit)return;
+      x=hit.x;y=hit.y;r=Math.max(14,Math.min(36,hit.radius*.85));
+    }
+    const progress=Math.min(1,age/.55),opacity=Math.pow(1-progress,1.7)*.68;
+    ctx.save();
+    ctx.beginPath();ctx.arc(x,y,r*(1.05+progress*.33),0,Math.PI*2);
+    ctx.strokeStyle=`rgba(243,207,137,${opacity})`;
+    ctx.lineWidth=Math.max(1.1,2.7*(1-progress));
+    ctx.shadowColor='rgba(242,198,116,.85)';ctx.shadowBlur=12+16*(1-progress);
+    ctx.stroke();ctx.restore();
+  }
   frame(now){if(!this.active)return;
     const maximumFramesPerSecond=this.w<640?27:30;
     if(now-this.last<1000/maximumFramesPerSecond){this.raf=requestAnimationFrame(n=>this.frame(n));return;}
@@ -269,6 +289,7 @@ export class CelestialReceiver {
     if(this.scope.view==='focus')this.drawFocus(playback,bright);
     else if(this.scope.view==='group')this.drawGroup(playback,bright);
     else this.drawOverview(playback,bright);
+    this.drawLoopReturn(playback);
     this.raf=requestAnimationFrame(n=>this.frame(n));
   }
 }

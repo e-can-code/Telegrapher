@@ -1,10 +1,10 @@
-# Telegrapher 2.3.1 — Receiver web compatibility hotfix
+# Telegrapher 2.5 — Receiver web compatibility hotfix
 
 This edition restores the complete **Receiver** to the web distribution while preserving Compose message naming, Quiet, Notes, Library, the Living Metal Armillary and the sound engine introduced in 2.2.
 
 ## Running the web app
 
-Extract the entire `Telegrapher_wv2.3.1.zip`. Keep `index.html`, `js/`, and `styles/` together.
+Extract the entire `Telegrapher_wv2.5.zip`. Keep `index.html`, `js/`, and `styles/` together.
 
 - **Quick preview:** Open `index.html` in a desktop browser. The release now uses a prebuilt classic browser script, so its main controls and Receiver no longer depend on loading ES modules over `file://`. Some browsers restrict local persistent storage; use HTTP for reliable Library functionality.
 - **Recommended local use:** From the extracted directory run `python -m http.server 8000`, then open `http://localhost:8000`.
@@ -12,7 +12,7 @@ Extract the entire `Telegrapher_wv2.3.1.zip`. Keep `index.html`, `js/`, and `sty
 
 The distributed website requires **no build step**. `js/telegrapher-bundle.js` is the browser entry point, compiled from the existing `js/` application modules. The original source modules remain in the archive for diagnostics and continued development. Do not replace the bundle with `js/app.js` in the distributed HTML: native ES modules may not load from local file URLs.
 
-The service worker now uses cache `telegrapher-v2.3.1` and pre-caches the new browser bundle. After replacing an older GitHub Pages version, refresh the page to receive the updated files. **Do not delete site data or IndexedDB to fix a cache issue**; the Library is local to that storage.
+The service worker now uses cache `telegrapher-v2.5` and pre-caches the new browser bundle. After replacing an older GitHub Pages version, refresh the page to receive the updated files. **Do not delete site data or IndexedDB to fix a cache issue**; the Library is local to that storage.
 
 ## Compose naming
 
@@ -26,8 +26,12 @@ A quiet mechanical start cue is **audio-only**. The firefly and Receiver lights 
 
 ## Android Studio edition
 
-`Telegrapher_v2.3.1.zip` contains the Android Studio project, with application ID `org.morsecomposer.foundation`, version name `2.3.1` and version code `24`. Extract and open in Android Studio, then use **Build > Build APK(s)**. To update without uninstalling and losing local storage, sign the APK with the same signing key as the installed app. Android retains the ES-module startup that was already functioning; it uses the same application source as the web edition.
+`Telegrapher_v2.5.zip` contains the Android Studio project, with application ID `org.morsecomposer.foundation`, version name `2.5` and version code `24`. Extract and open in Android Studio, then use **Build > Build APK(s)**. To update without uninstalling and losing local storage, sign the APK with the same signing key as the installed app. Android retains the ES-module startup that was already functioning; it uses the same application source as the web edition.
 
 ## Verification and limits
 
 Run `node --test tests/*.test.js` to validate application logic. The bundled browser startup has been exercised in Chromium using an inlined fixture at phone and desktop sizes, including importing a five-word WAV into Receiver. The build environment blocks normal browser navigation to localhost and local file URLs, so **actual Firefox, GitHub Pages, file:// and Android installation still require user testing**. See `RELEASE_NOTES.md` and `in_next.txt`.
+
+## Receiver 2.5 controls
+
+The left circular transport control restarts the current word. The right control selects and plays the next word; it is inactive on the last word. The Loop control remains independent. At each loop completion a short visual acknowledgement appears around the outer Armillary and Loop control, not in the Morse light.

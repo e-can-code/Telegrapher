@@ -1,7 +1,7 @@
-/* Telegrapher 2.3.1 browser distribution. Generated from js/ ES modules. */
+/* Telegrapher 2.5 offline browser distribution */
 (function(){
-  'use strict';
-  const modules={
+"use strict";
+const modules={
 "js/app.js":function(module,exports,require){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -26,7 +26,7 @@ Promise.resolve().then(() => require('./compose/compose-controller.js')).catch(e
 // Android bundles all assets and does not need a browser service worker.
 if ('serviceWorker' in navigator && location.hostname !== 'appassets.androidplatform.net') {
     window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=2.3.1').then(reg => reg.update()).catch(error => console.warn('Offline cache unavailable', error));
+        navigator.serviceWorker.register('./sw.js?v=2.5').then(reg => reg.update()).catch(error => console.warn('Offline cache unavailable', error));
     });
 }
 
@@ -110,7 +110,7 @@ class ListeningTransport extends EventTarget {
         this.loadSerial = 0;
         this.processing = false;
     }
-    contextForPlayback() { this.context ?? (this.context = new (window.AudioContext || window.webkitAudioContext)({ latencyHint: 'interactive' })); return this.context; }
+    contextForPlayback() { this.context ??= new (window.AudioContext || window.webkitAudioContext)({ latencyHint: 'interactive' }); return this.context; }
     async load(blob) {
         this.pause();
         const serial = ++this.loadSerial;
@@ -170,6 +170,24 @@ class ListeningTransport extends EventTarget {
         if (total <= 0)
             return this.scope.start;
         return this.scope.start + Math.min((this.anchor - this.scope.start + elapsed * this.rate) % total, span);
+    }
+    // Time since the most recent completed loop interval, measured on the audible
+    // output clock. Negative means no completion is currently being presented.
+    // The visual renderer never treats this event as a Morse tone.
+    get loopCompletionAge() {
+        if (!this.loop || this.paused || this.scope.end <= this.scope.start)
+            return -1;
+        const elapsed = this.audibleClock() - this.startAt;
+        if (elapsed < 0)
+            return -1;
+        const firstDuration = (this.scope.end - this.anchor) / this.rate;
+        if (elapsed < firstDuration)
+            return -1;
+        const cycleDuration = (this.scope.end - this.scope.start) / this.rate + this.gap;
+        if (cycleDuration <= 0)
+            return -1;
+        const age = (elapsed - firstDuration) % cycleDuration;
+        return age >= 0 && age < Math.min(.72, this.gap) ? age : -1;
     }
     get isMorseAudible() { return !this.paused && this.audibleClock() >= this.startAt && (this.loop ? this.visualPosition < this.scope.end - 1e-5 : true); }
     // getOutputTimestamp gives context time at audio output, rather than the
@@ -350,7 +368,7 @@ class ListeningTransport extends EventTarget {
             src.loop = true;
         }
         src.buffer = audioBuffer;
-        this.gain ?? (this.gain = ctx.createGain());
+        this.gain ??= ctx.createGain();
         this.gain.gain.value = this._volume;
         src.connect(this.gain);
         this.gain.connect(ctx.destination);
@@ -378,7 +396,6 @@ exports.ListeningTransport = ListeningTransport;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PlaybackHighlight = void 0;
 exports.timeline = timeline;
-const morse_js_1 = require("../core/morse.js");
 // Each tone event carries its character and mark index for visual tracking.
 function timeline(chars, wpm) {
     const unit = 1200 / wpm;
@@ -398,45 +415,38 @@ function timeline(chars, wpm) {
     return entries;
 }
 class PlaybackHighlight {
-    constructor(tiles) {
-        this.tick = () => {
-            const elapsed = (this.audio?.currentTime ?? 0) * 1000;
-            const current = this.entries.find(e => elapsed >= e.start && elapsed < e.end);
-            const currentIndex = current?.character ?? -1;
-            this.tiles.querySelectorAll('.tile').forEach((el, i) => {
-                el.classList.toggle('playing', i === currentIndex);
-                el.dataset.mark = i === currentIndex ? String(current.mark) : '';
-                el.querySelectorAll('.mark').forEach((m, j) => m.classList.toggle('sounding', i === currentIndex && j === current.mark));
-            });
-            // Gaps are visible units of the composition; illuminate the word boundary
-            // during the silent interval, not during either adjacent character.
-            const next = this.entries.find(e => e.start > elapsed);
-            const inWordGap = currentIndex < 0 && next && next.character > 0 &&
-                this.entries.some(e => e.character === next.character - 1 && e.end <= elapsed) &&
-                this.tiles.querySelectorAll('.tile')[next.character]?.classList.contains('word-start');
-            this.tiles.querySelectorAll('.tile.word-start').forEach(el => el.classList.remove('word-gap-playing'));
-            if (inWordGap)
-                this.tiles.querySelectorAll('.tile')[next.character]?.classList.add('word-gap-playing');
-            if (currentIndex !== -1 && currentIndex !== this.lastCharacter) {
-                const tile = this.tiles.querySelectorAll('.tile')[currentIndex];
-                if (tile) {
-                    const left = tile.offsetLeft;
-                    const right = left + tile.offsetWidth;
-                    if (left < this.tiles.scrollLeft || right > this.tiles.scrollLeft + this.tiles.clientWidth)
-                        this.tiles.scrollTo({ left: Math.max(0, left - 10), behavior: 'smooth' });
-                }
-            }
-            this.lastCharacter = currentIndex;
-            this.frame = requestAnimationFrame(this.tick);
-        };
-        this.tiles = tiles;
-        this.frame = 0;
-        this.entries = [];
-        this.audio = null;
-        this.pausedAt = null;
-        this.lastCharacter = -1;
-    }
+    constructor(tiles) { this.tiles = tiles; this.frame = 0; this.entries = []; this.audio = null; this.pausedAt = null; this.lastCharacter = -1; }
     start(chars, wpm, audio) { this.stop(); this.entries = timeline(chars, wpm); this.audio = audio; this.lastCharacter = -1; this.tick(); }
+    tick = () => {
+        const elapsed = (this.audio?.currentTime ?? 0) * 1000;
+        const current = this.entries.find(e => elapsed >= e.start && elapsed < e.end);
+        const currentIndex = current?.character ?? -1;
+        this.tiles.querySelectorAll('.tile').forEach((el, i) => {
+            el.classList.toggle('playing', i === currentIndex);
+            el.dataset.mark = i === currentIndex ? String(current.mark) : '';
+            el.querySelectorAll('.mark').forEach((m, j) => m.classList.toggle('sounding', i === currentIndex && j === current.mark));
+        });
+        // Gaps are visible units of the composition; illuminate the word boundary
+        // during the silent interval, not during either adjacent character.
+        const next = this.entries.find(e => e.start > elapsed);
+        const inWordGap = currentIndex < 0 && next && next.character > 0 &&
+            this.entries.some(e => e.character === next.character - 1 && e.end <= elapsed) &&
+            this.tiles.querySelectorAll('.tile')[next.character]?.classList.contains('word-start');
+        this.tiles.querySelectorAll('.tile.word-start').forEach(el => el.classList.remove('word-gap-playing'));
+        if (inWordGap)
+            this.tiles.querySelectorAll('.tile')[next.character]?.classList.add('word-gap-playing');
+        if (currentIndex !== -1 && currentIndex !== this.lastCharacter) {
+            const tile = this.tiles.querySelectorAll('.tile')[currentIndex];
+            if (tile) {
+                const left = tile.offsetLeft;
+                const right = left + tile.offsetWidth;
+                if (left < this.tiles.scrollLeft || right > this.tiles.scrollLeft + this.tiles.clientWidth)
+                    this.tiles.scrollTo({ left: Math.max(0, left - 10), behavior: 'smooth' });
+            }
+        }
+        this.lastCharacter = currentIndex;
+        this.frame = requestAnimationFrame(this.tick);
+    };
     pause() { cancelAnimationFrame(this.frame); }
     resume() { this.tick(); }
     stop() {
@@ -512,7 +522,7 @@ function profileWave(c, p) {
     waves.set(p.id, wave);
     return wave;
 }
-function ctx() { context ?? (context = new (window.AudioContext || window.webkitAudioContext)({ latencyHint: 'interactive' })); return context; }
+function ctx() { context ??= new (window.AudioContext || window.webkitAudioContext)({ latencyHint: 'interactive' }); return context; }
 function prepare() {
     const c = ctx();
     if (osc)
@@ -2381,7 +2391,8 @@ class CelestialReceiver {
         ctx.lineTo(right, baseY);
         ctx.stroke();
         for (let i = first; i < last; i++) {
-            const x = left + spacing * (i - this.railOffset + .5);
+            const railLeft = n <= 5 ? (w - n * spacing) / 2 : left;
+            const x = railLeft + spacing * (i - this.railOffset + .5);
             if (x < 12 || x > w - 12)
                 continue;
             const isActive = active === i, selected = this.scope.queued === i;
@@ -2463,6 +2474,32 @@ class CelestialReceiver {
         drawFullArmillary(ctx, cx, cy, S, this.t, this.signatures[index] || { ratio: .34, density: .5 }, bright, this.reduced ? 42 : 56);
         this.hits.push({ kind: 'center', index, x: cx, y: cy, radius: S * .96 });
     }
+    drawLoopReturn(playback) {
+        const age = playback.loopCompletionAge;
+        if (!(age >= 0 && age < .72))
+            return;
+        const ctx = this.ctx, focus = this.scope.view === 'focus';
+        let x = this.w * .5, y = this.h * .46, r = Math.min(this.w * .33, this.h * .34, 235);
+        if (!focus) {
+            const current = this.scope.wordAt(Math.max(0, this.scope.interval().end - .001));
+            const hit = this.hits.find(h => h.kind === 'word' && h.index === current);
+            if (!hit)
+                return;
+            x = hit.x;
+            y = hit.y;
+            r = Math.max(14, Math.min(36, hit.radius * .85));
+        }
+        const progress = Math.min(1, age / .55), opacity = Math.pow(1 - progress, 1.7) * .68;
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(x, y, r * (1.05 + progress * .33), 0, Math.PI * 2);
+        ctx.strokeStyle = `rgba(243,207,137,${opacity})`;
+        ctx.lineWidth = Math.max(1.1, 2.7 * (1 - progress));
+        ctx.shadowColor = 'rgba(242,198,116,.85)';
+        ctx.shadowBlur = 12 + 16 * (1 - progress);
+        ctx.stroke();
+        ctx.restore();
+    }
     frame(now) {
         if (!this.active)
             return;
@@ -2483,6 +2520,7 @@ class CelestialReceiver {
             this.drawGroup(playback, bright);
         else
             this.drawOverview(playback, bright);
+        this.drawLoopReturn(playback);
         this.raf = requestAnimationFrame(n => this.frame(n));
     }
 }
@@ -2586,7 +2624,7 @@ function initQuiet() {
     let renderer, rendererFailed = false;
     try {
         renderer = new celestial_receiver_js_1.CelestialReceiver({ canvas: $('receiverCanvas'), scope,
-            getPlayback: () => ({ position: audio.visualPosition, playing: audio.isMorseAudible, rate: audio.playbackRate, loaded }),
+            getPlayback: () => ({ position: audio.visualPosition, playing: audio.isMorseAudible, rate: audio.playbackRate, loaded, loopCompletionAge: audio.loopCompletionAge }),
             onWord: i => focusWord(i), onGroup: i => enterGroup(i), onBack: () => stepOut() });
     }
     catch (e) {
@@ -2604,14 +2642,16 @@ function initQuiet() {
             $('receiverWordNumber').value = String(scope.selected + 1);
         $('receiverBack').hidden = scope.view === 'overview' || words.length <= 1;
         $('receiverHint').textContent = rendererFailed ? 'Celestial renderer unavailable; use the Word number and transport below' : !loaded ? 'Load a WAV in Quiet first' : !words.length ? 'No reliable boundaries; whole recording remains playable' : focused ? `Word ${scope.selected + 1} of ${words.length} · Double tap empty sky to return` : scope.view === 'group' ? `Passage ${scope.group + 1} · Touch a word to focus` : renderer.layout.count > 35 ? 'Touch a luminous cluster to explore' : 'Touch a celestial body to focus; move the pointer to explore nearby stardust';
-        $('receiverStatus').textContent = focused ? `WORD ${scope.selected + 1} · ${clock(words[scope.selected].start)}–${clock(words[scope.selected].end)}` : scope.view === 'group' ? 'CELESTIAL FAMILY' : 'WHOLE RECORDING';
+        $('receiverStatus').textContent = focused ? `WORD ${scope.selected + 1} · ${clock(words[scope.selected].start)}–${clock(words[scope.selected].end)}` : scope.view === 'group' ? 'CELESTIAL FAMILY' : '';
         for (const id of ['receiverLoop', 'listenLoop'])
             $(id).setAttribute('aria-pressed', String(scope.loop));
         const pause = !audio.paused;
         $('receiverPlay').textContent = pause ? 'Ⅱ' : '▶';
         $('receiverPlay').setAttribute('aria-label', pause ? 'Pause' : 'Play');
         $('receiverSpeed').textContent = Number(audio.playbackRate.toFixed(2)) + '×';
-        $('receiverAudioMode').textContent = audio.mode === 'clean' ? 'Clean' : 'Original';
+        const atEnd = loaded && words.length > 0 && currentWordIndex() >= words.length - 1;
+        $('receiverNext').disabled = !loaded || !words.length || atEnd;
+        $('receiverPrevious').disabled = !loaded;
     }
     function showMode(next) {
         mode = next === 'receiver' ? 'receiver' : 'quiet';
@@ -2673,15 +2713,48 @@ function initQuiet() {
         selectionArmed = false;
         updateReceiverControls();
     }
-    function neighbor(direction) {
+    // Restart always replays the current word; Next advances one whole word.
+    // A word is identified by its measured interval, not by an inferred letter gap.
+    function currentWordIndex() {
+        if (!words.length)
+            return -1;
+        if (scope.view === 'focus' && scope.selected >= 0)
+            return scope.selected;
+        const position = audio.currentTime;
+        const sounding = scope.wordAt(position);
+        if (sounding >= 0)
+            return sounding;
+        const following = words.findIndex(word => word.start > position + .015);
+        if (following >= 0)
+            return following;
+        return Math.max(0, Math.min(words.length - 1, scope.queued));
+    }
+    function playWord(index) {
+        if (!loaded || index < 0 || index >= words.length)
+            return;
+        focusWord(index);
+        void togglePlayback();
+    }
+    function restartCurrentWord() {
+        if (!loaded)
+            return;
+        const index = currentWordIndex();
+        if (index < 0) {
+            audio.pause();
+            seekTo(0);
+            selectionArmed = true;
+            void togglePlayback();
+            return;
+        }
+        playWord(index);
+    }
+    function playNextWord() {
         if (!loaded || !words.length)
             return;
-        audio.pause();
-        const pos = scope.neighbor(direction);
-        if (pos !== null)
-            seekTo(pos);
-        selectionArmed = true;
-        updateReceiverControls();
+        const index = currentWordIndex();
+        if (index >= words.length - 1)
+            return;
+        playWord(index + 1);
     }
     async function togglePlayback() {
         if (!loaded) {
@@ -2711,20 +2784,31 @@ function initQuiet() {
         }
     }
     document.querySelectorAll('[data-listen-mode]').forEach(b => b.addEventListener('click', () => showMode(b.dataset.listenMode)));
-    $('receiverPrevious').addEventListener('click', () => neighbor(-1));
-    $('receiverNext').addEventListener('click', () => neighbor(1));
+    $('receiverPrevious').addEventListener('click', restartCurrentWord);
+    $('receiverNext').addEventListener('click', playNextWord);
     $('receiverPlay').addEventListener('click', () => void togglePlayback());
     $('receiverLoop').addEventListener('click', () => toggleLoop());
     $('receiverBack').addEventListener('click', stepOut);
     $('receiverFind').addEventListener('click', () => focusWord(Math.max(0, Math.min(words.length - 1, Math.round(Number($('receiverWordNumber').value) || 1) - 1))));
     $('receiverWordNumber').addEventListener('keydown', e => { if (e.key === 'Enter')
         $('receiverFind').click(); });
+    const receiverSpeedMenu = $('receiverSpeedMenu');
     $('receiverSpeed').addEventListener('click', () => {
-        const options = [.5, .75, 1, 1.25, 1.5, 2];
-        const current = options.findIndex(v => Math.abs(v - audio.playbackRate) < .01);
-        void setSpeed(options[(current + 1) % options.length]);
+        receiverSpeedMenu.hidden = !receiverSpeedMenu.hidden;
+        $('receiverSpeed').setAttribute('aria-expanded', String(!receiverSpeedMenu.hidden));
     });
-    $('receiverAudioMode').addEventListener('click', () => void setAudioMode(audio.mode === 'clean' ? 'original' : 'clean'));
+    for (const button of receiverSpeedMenu.querySelectorAll('[data-receiver-rate]'))
+        button.addEventListener('click', () => {
+            receiverSpeedMenu.hidden = true;
+            $('receiverSpeed').setAttribute('aria-expanded', 'false');
+            void setSpeed(button.dataset.receiverRate);
+        });
+    document.addEventListener('pointerdown', event => {
+        if (!event.target.closest('.receiver-speed-wrap')) {
+            receiverSpeedMenu.hidden = true;
+            $('receiverSpeed').setAttribute('aria-expanded', 'false');
+        }
+    });
     function toggleLoop() {
         const playing = !audio.paused, region = scope.interval();
         scope.setLoop(!scope.loop);
@@ -2760,9 +2844,14 @@ function initQuiet() {
         fireflyFrame = requestAnimationFrame(animateFirefly);
     }
     fireflyFrame = requestAnimationFrame(animateFirefly);
-    function animate() { update(); if (!audio.paused)
-        raf = requestAnimationFrame(animate); }
-    function stopAnimation() { cancelAnimationFrame(raf); update(); }
+    function animate() {
+        update();
+        const completion = audio.loopCompletionAge;
+        $('receiverLoop').style.setProperty('--loop-return', completion >= 0 ? String(Math.max(0, 1 - completion / .5)) : '0');
+        if (!audio.paused)
+            raf = requestAnimationFrame(animate);
+    }
+    function stopAnimation() { cancelAnimationFrame(raf); $('receiverLoop').style.setProperty('--loop-return', '0'); update(); }
     audio.addEventListener('play', () => { cancelAnimationFrame(raf); animate(); });
     audio.addEventListener('pause', stopAnimation);
     audio.addEventListener('seeked', update);
@@ -2812,6 +2901,9 @@ function initQuiet() {
         $('listenStage').classList.add('has-audio');
         $('listenNotesText').value = notes ?? '';
         lastNotes = $('listenNotesText').value;
+        notesCaret = 0;
+        notesEnd = 0;
+        requestAnimationFrame(drawNotesCaret);
         update();
         if (persist) {
             try {
@@ -2930,7 +3022,6 @@ function initQuiet() {
             b.disabled = b.dataset.audioMode === 'clean' && !tones.length;
             b.setAttribute('aria-pressed', String(b.dataset.audioMode === audio.mode));
         }
-        $('receiverAudioMode').disabled = !tones.length;
     }
     async function setAudioMode(mode) {
         if (!loaded)
@@ -2956,8 +3047,93 @@ function initQuiet() {
     $('listenSoundToggle').addEventListener('click', () => { const p = $('listenSoundPanel'); p.hidden = !p.hidden; $('listenSoundToggle').setAttribute('aria-expanded', String(!p.hidden)); });
     $('listenVolume').addEventListener('input', e => audio.volume = Number(e.target.value) / 100);
     const noteArea = $('listenNotesText'), noteKeys = $('listenNotesKeys');
+    const touchCaret = $('notesTouchCaret');
+    function notesCaretPosition(index) {
+        const text = noteArea.value.slice(0, index), style = getComputedStyle(noteArea);
+        const canvas = document.createElement('canvas'), ctx = canvas.getContext('2d');
+        ctx.font = style.font;
+        const padLeft = parseFloat(style.paddingLeft) || 0, padTop = parseFloat(style.paddingTop) || 0;
+        const available = Math.max(40, noteArea.clientWidth - padLeft - (parseFloat(style.paddingRight) || 0));
+        let line = 0, width = 0;
+        for (const ch of text) {
+            if (ch === '\n') {
+                line++;
+                width = 0;
+                continue;
+            }
+            const w = ctx.measureText(ch).width;
+            if (width + w > available && width > 0) {
+                line++;
+                width = 0;
+            }
+            width += w;
+        }
+        const lineHeight = parseFloat(style.lineHeight) || parseFloat(style.fontSize) * 1.35;
+        return { x: padLeft + width, y: padTop + line * lineHeight - noteArea.scrollTop };
+    }
+    function drawNotesCaret() {
+        const pos = notesCaretPosition(notesCaret);
+        touchCaret.style.left = `${Math.max(6, Math.min(noteArea.clientWidth - 10, pos.x))}px`;
+        touchCaret.style.top = `${Math.max(4, Math.min(noteArea.clientHeight - 20, pos.y))}px`;
+        touchCaret.setAttribute('aria-valuemax', String(noteArea.value.length));
+        touchCaret.setAttribute('aria-valuenow', String(notesCaret));
+    }
+    function moveNotesCaret(delta) {
+        notesCaret = Math.max(0, Math.min(noteArea.value.length, notesCaret + delta));
+        notesEnd = notesCaret;
+        noteArea.setSelectionRange(notesCaret, notesCaret);
+        drawNotesCaret();
+    }
+    function pointToCaret(x, y) {
+        const style = getComputedStyle(noteArea), padLeft = parseFloat(style.paddingLeft) || 0;
+        const padTop = parseFloat(style.paddingTop) || 0;
+        const lineHeight = parseFloat(style.lineHeight) || parseFloat(style.fontSize) * 1.35;
+        const line = Math.max(0, Math.round((y + noteArea.scrollTop - padTop) / lineHeight));
+        const lines = noteArea.value.split('\n');
+        let offset = 0;
+        for (let i = 0; i < Math.min(line, lines.length - 1); i++)
+            offset += lines[i].length + 1;
+        const value = lines[Math.min(line, lines.length - 1)] || '';
+        const canvas = document.createElement('canvas'), ctx = canvas.getContext('2d');
+        ctx.font = style.font;
+        let width = 0, closest = 0, best = Infinity;
+        for (let i = 0; i <= value.length; i++) {
+            const d = Math.abs(width - (x - padLeft));
+            if (d < best) {
+                best = d;
+                closest = i;
+            }
+            if (i < value.length)
+                width += ctx.measureText(value[i]).width;
+        }
+        notesCaret = Math.min(noteArea.value.length, offset + closest);
+        notesEnd = notesCaret;
+        noteArea.setSelectionRange(notesCaret, notesCaret);
+        drawNotesCaret();
+    }
+    touchCaret.addEventListener('pointerdown', event => { event.preventDefault(); touchCaret.setPointerCapture(event.pointerId); });
+    touchCaret.addEventListener('pointermove', event => {
+        if (!touchCaret.hasPointerCapture(event.pointerId))
+            return;
+        event.preventDefault();
+        const r = noteArea.getBoundingClientRect();
+        pointToCaret(event.clientX - r.left, event.clientY - r.top);
+    });
+    touchCaret.addEventListener('keydown', event => {
+        if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+            event.preventDefault();
+            moveNotesCaret(event.key === 'ArrowLeft' ? -1 : 1);
+        }
+    });
+    for (const [id, d] of [['notesCaretLeft', -1], ['notesCaretRight', 1]]) {
+        const button = $(id);
+        button.addEventListener('pointerdown', e => e.preventDefault());
+        button.addEventListener('click', () => moveNotesCaret(d));
+    }
+    noteArea.addEventListener('scroll', drawNotesCaret);
+    window.addEventListener('resize', drawNotesCaret);
     let notesCaret = 0, notesEnd = 0;
-    function captureCaret() { notesCaret = noteArea.selectionStart; notesEnd = noteArea.selectionEnd; }
+    function captureCaret() { notesCaret = noteArea.selectionStart; notesEnd = noteArea.selectionEnd; drawNotesCaret(); }
     function positionWriting() {
         if ($('listenNotesPanel').hidden)
             return;
@@ -2981,6 +3157,7 @@ function initQuiet() {
             $('listenNotesKeyboard').setAttribute('aria-expanded', 'true');
             // No focus here: opening Notes must not summon the Android keyboard.
             requestAnimationFrame(positionWriting);
+            requestAnimationFrame(drawNotesCaret);
         }
         else {
             noteArea.blur();
@@ -3026,6 +3203,7 @@ function initQuiet() {
         renderer.start(); });
     window.addEventListener('pagehide', () => { cancelAnimationFrame(fireflyFrame); audio.pause(); renderer.stop(); void saveNotes(); });
     update();
+    requestAnimationFrame(drawNotesCaret);
 }
 
 },
@@ -3439,32 +3617,10 @@ catch { } }
     open('compose');
 })();
 
-}
+},
 };
-  const cache=Object.create(null);
-  function resolve(from,requested){
-    if(requested.startsWith('./')||requested.startsWith('../')){
-      const out=from.split('/');out.pop();
-      for(const part of requested.split('/')){
-        if(part==='.'||!part)continue;
-        if(part==='..')out.pop();else out.push(part);
-      }
-      return out.join('/');
-    }
-    throw new Error('External module not bundled: '+requested);
-  }
-  function load(id){
-    if(cache[id])return cache[id].exports;
-    const factory=modules[id];
-    if(!factory)throw new Error('Missing bundled module: '+id);
-    const module={exports:{}};cache[id]=module;
-    factory(module,module.exports,requested=>load(resolve(id,requested)));
-    return module.exports;
-  }
-  try{load('js/app.js');}
-  catch(error){
-    console.error('Telegrapher startup failed',error);
-    const p=document.getElementById('listenError');
-    if(p)p.textContent='Application startup failed: '+error.message;
-  }
+const cache=Object.create(null);
+function resolve(from,requested){const a=from.split("/");a.pop();for(const p of requested.split("/")){if(p==="..")a.pop();else if(p!=="."&&p)a.push(p);}return a.join("/");}
+function load(id){if(cache[id])return cache[id].exports;const factory=modules[id];if(!factory)throw new Error("Missing module "+id);const module={exports:{}};cache[id]=module;factory(module,module.exports,requested=>load(resolve(id,requested)));return module.exports;}
+try{load("js/app.js");}catch(e){console.error(e);const el=document.getElementById("listenError");if(el)el.textContent="Application startup failed: "+e.message;}
 })();

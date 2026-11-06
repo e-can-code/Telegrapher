@@ -45,6 +45,20 @@ export class ListeningTransport extends EventTarget {
   const total=span+this.gap*this.rate;if(total<=0)return this.scope.start;
   return this.scope.start+Math.min((this.anchor-this.scope.start+elapsed*this.rate)%total,span);
  }
+ // Time since the most recent completed loop interval, measured on the audible
+ // output clock. Negative means no completion is currently being presented.
+ // The visual renderer never treats this event as a Morse tone.
+ get loopCompletionAge(){
+  if(!this.loop||this.paused||this.scope.end<=this.scope.start)return -1;
+  const elapsed=this.audibleClock()-this.startAt;
+  if(elapsed<0)return -1;
+  const firstDuration=(this.scope.end-this.anchor)/this.rate;
+  if(elapsed<firstDuration)return -1;
+  const cycleDuration=(this.scope.end-this.scope.start)/this.rate+this.gap;
+  if(cycleDuration<=0)return -1;
+  const age=(elapsed-firstDuration)%cycleDuration;
+  return age>=0&&age<Math.min(.72,this.gap)?age:-1;
+ }
  get isMorseAudible(){return !this.paused&&this.audibleClock()>=this.startAt&&(this.loop?this.visualPosition<this.scope.end-1e-5:true);}
  // getOutputTimestamp gives context time at audio output, rather than the
  // look-ahead time at which JS may already have scheduled future samples.
