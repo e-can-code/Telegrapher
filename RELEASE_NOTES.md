@@ -1,5 +1,3 @@
-# Telegrapher 2.5 — Golden Return
+# Web-only release 2.5.1
 
-Receiver navigation now uses Restart Word and Next Word. The visual loop acknowledgement appears at the end of each loop interval, during the playback-only gap. It does not introduce an extra Morse flash or sound. The original mechanical start cue is retained.
-
-Known limitations: audio/video perceptual synchronization and loop-completion appearance require physical Android testing; some imported WAV word boundaries are estimates.
+The previous desktop archive shipped unreferenced desktop assets. This edition loads the new desktop layout and its input adapter explicitly. Browser and device testing are still required for performance and user experience.

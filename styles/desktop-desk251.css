@@ -1,0 +1,61 @@
+/* Desktop-only presentation. The Android layout and shared app controllers are unchanged. */
+.desktop-message-toggle,.desktop-listening-deck{display:none}
+@media(min-width:850px){
+ .app{max-width:1560px!important;width:min(97vw,1560px);margin:auto;box-sizing:border-box}
+ .app>header{display:flex;align-items:center;gap:16px;min-height:52px!important;margin-bottom:3px!important}
+ .app>header h1{font-size:clamp(22px,2.2vw,32px)!important;flex:0 1 auto;margin:0!important}
+ .app>header .eyebrow{font-size:10px}
+ .workspace-nav{position:absolute;top:19px;left:50%;transform:translateX(-50%);width:145px!important;height:32px!important;min-height:32px!important;margin:0!important;padding:2px!important;z-index:6}
+ .workspace-nav button{font-size:12px!important;padding:4px 9px!important;min-height:26px!important}
+ .listening-modes.desktop-modes{display:flex!important;position:absolute;right:65px;top:16px;margin:0!important;gap:6px;z-index:6;align-items:center}
+ .listening-modes.desktop-modes button{min-width:52px!important;min-height:32px!important;padding:2px 8px!important}
+ .listening-modes.desktop-modes small{font-size:10px}
+ .compose-workspace:not([hidden]){display:grid!important;grid-template-columns:minmax(0,1fr) minmax(280px,.76fr);grid-template-rows:auto minmax(320px,1fr) auto;gap:10px 20px;min-height:calc(100dvh - 130px);align-items:center}
+ .compose-workspace .desktop-message-toggle{display:block;grid-column:2;grid-row:1;justify-self:end;border:1px solid #987d4d;background:#183a2a;color:#e7d19d;border-radius:9px;padding:8px 13px;cursor:pointer}
+ .compose-workspace>.message{grid-column:2;grid-row:2/4;min-height:0;max-height:72vh;overflow:auto;align-self:stretch}
+ .compose-workspace:not(.message-expanded)>.message{display:none!important}
+ .compose-workspace>.instrument{grid-column:1;grid-row:2;display:flex;justify-content:center;align-items:center;min-height:360px}
+ .compose-workspace .key{width:min(33vw,430px)!important;height:min(33vw,430px)!important}
+ .compose-workspace>.actions{grid-column:1;grid-row:3;align-self:end}
+ .compose-workspace:not(.message-expanded)>.instrument,.compose-workspace:not(.message-expanded)>.actions{grid-column:1/3}
+ .compose-workspace:not(.message-expanded)>.instrument .key{width:min(41vw,480px)!important;height:min(41vw,480px)!important}
+ .listen-workspace:not([hidden]){display:grid!important;grid-template-columns:minmax(0,1.18fr) minmax(310px,.82fr);grid-template-rows:minmax(420px,1fr) auto auto auto;gap:8px 20px;align-items:stretch;min-height:calc(100dvh - 110px)}
+ .listen-workspace .listening-modes{display:none!important}
+ .listen-workspace .foundation-stage,.listen-workspace .receiver-instrument{grid-column:1;grid-row:1;min-height:440px!important;height:clamp(440px,65vh,820px)!important;max-height:820px;align-self:stretch}
+ .listen-workspace.receiver-active .receiver-instrument{display:flex!important;min-height:440px!important;height:clamp(440px,65vh,820px)!important;flex:initial!important}
+ .listen-workspace .foundation-stage{min-height:440px!important;}
+ .listen-workspace .foundation-stage[hidden],.listen-workspace .receiver-instrument[hidden]{display:none!important}
+ .listen-workspace .foundation-head{grid-column:1;grid-row:2;margin:0!important;padding:3px 0!important}
+ .listen-workspace .foundation-speed{grid-column:1;grid-row:3;margin:0!important;padding:4px 0!important;gap:5px!important}
+ .listen-workspace .foundation-speed .foundation-presets{gap:6px!important}
+ .listen-workspace .foundation-console{grid-column:1;grid-row:4;margin:0!important}
+ .listen-workspace .foundation-bottom{grid-column:2;grid-row:2;margin:0!important}
+ .listen-workspace #listenNotesPanel{grid-column:2;grid-row:1;display:flex!important;flex-direction:column;min-height:0;margin:0!important;background:transparent;border:1px solid #5d785c;border-radius:10px;padding:14px;overflow:auto}
+ .listen-workspace #listenNotesPanel[hidden]{display:flex!important}
+ .listen-workspace #listenNotesPanel .note-edit-surface{flex:1;min-height:100px}
+ .listen-workspace #listenNotesPanel textarea{height:100%;min-height:120px;resize:vertical}
+ .listen-workspace #listenNotesPanel .foundation-note-keys{margin-top:auto}
+ .listen-workspace #listenNotesToggle{display:none!important}
+ .listen-workspace.notes-open .receiver-instrument{min-height:440px!important;height:clamp(440px,65vh,820px)!important;flex:initial!important}
+ .listen-workspace.notes-open .receiver-readout{display:flex!important}
+ .listen-workspace.notes-open .receiver-subnav{display:flex!important}
+ .listen-workspace.receiver-active .foundation-head,.listen-workspace.receiver-active .foundation-speed{display:flex!important;grid-column:1}
+ .listen-workspace.receiver-active .foundation-console{display:none!important}
+ .listen-workspace.receiver-active .foundation-head{grid-row:2}
+ .listen-workspace.receiver-active .foundation-speed{grid-row:3}
+ .listen-workspace .desktop-listening-deck{display:flex;grid-column:2;grid-row:3/5;flex-direction:column;justify-content:center;gap:6px;border-top:1px solid #8b794e;padding-top:8px}
+ .desktop-deck-caption{font-size:10px;letter-spacing:1.5px;color:#d5bc83}
+ .desktop-deck-caption span{color:#8fa996}
+ .desktop-deck-keys{display:flex;gap:8px}
+ .desktop-deck-keys button{flex:1;min-height:64px;background:radial-gradient(ellipse at 50% 20%,#4a7454,#193b2b 85%);border:1px solid #bda06c;border-radius:28px;color:#f0d9a5;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:5px;cursor:pointer}
+ .desktop-deck-keys button:active{background:#c6aa74;color:#10291e}
+ .deck-dot{width:13px;height:13px;border-radius:50%;background:radial-gradient(circle at 30% 25%,#fff4d7,#d4ad67)}
+ .deck-dash{width:32px;height:11px;border-radius:10px;background:linear-gradient(#fff0c7,#cda15c)}
+ .desktop-deck-keys small{font-size:10px;letter-spacing:1px}
+ .listen-workspace #listenSoundPanel{grid-column:2;grid-row:4}
+ .listen-workspace #listenError,.listen-workspace .listen-privacy{grid-column:1/3}
+}
+.desktop-key-settings{border:1px solid #7e855e;border-radius:9px;padding:12px;margin:12px 0}
+.desktop-key-settings label{display:flex;justify-content:space-between;gap:15px;align-items:center;margin:8px 0}
+.desktop-key-settings input{width:55px;text-align:center;text-transform:uppercase}
+@media(min-width:850px) and (max-width:1100px){.workspace-nav{left:47%}.listening-modes.desktop-modes{right:44px}.listen-workspace:not([hidden]){grid-template-columns:minmax(0,1fr) minmax(280px,.8fr)}}

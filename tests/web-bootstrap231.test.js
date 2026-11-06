@@ -4,7 +4,7 @@ import {readFileSync} from 'node:fs';
 const read=p=>readFileSync(new URL('../'+p,import.meta.url),'utf8');
 test('web distribution has bundled classic entry point and preserves Receiver markup',()=>{
  const index=read('index.html');
- assert.match(index,/<script defer src="js\/telegrapher-bundle\.js\?v=2\.5"/);
+ assert.match(index,/<script defer src="js\/telegrapher-bundle\.js\?v=2\.5\.1"/);
  assert.doesNotMatch(index,/<script type="module" src="js\/app\.js/);
  for(const id of ['receiverInstrument','receiverCanvas','receiverPlay','receiverPrevious','receiverNext','receiverLoop'])
   assert.match(index,new RegExp('id="'+id+'"'));

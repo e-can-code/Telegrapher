@@ -1,9 +1,10 @@
-# Changelog
+# Telegrapher Web 2.5.1
 
-## 2.5 — Golden Return
-
-- Receiver's left transport button restarts the current word with the normal audio-only lead-in cue. In overview with no words detected, it restarts the recording.
-- Receiver's right transport button focuses and plays the next word. It is disabled at the last word.
-- Added an outer-ring loop-completion acknowledgement synchronized to the transport's output clock, with a subtle loop-control highlight. The central Morse signal light is not affected.
-- Preserved the existing transport button sizes, positions, palette, and focused Armillary.
-- Updated browser bundle and offline cache version.
+- Fixed missing desktop stylesheet and controller in the HTML entry point.
+- Desktop Compose message panel starts closed and can be expanded.
+- Moved desktop two-key Morse entry to Listen notes, with configurable F/J defaults.
+- Docked Notes beside the visual instrument on wide screens.
+- Reduced top navigation and moved Quiet/Receiver beside the settings gear.
+- Increased desktop Quiet and Receiver viewport dimensions.
+- Moved Quiet speed controls beneath the visual field and preserved the shared audio engine.
+- Refreshed service-worker assets and cache identifier.

@@ -1,7 +1,1 @@
-Telegrapher 2.5 follow-up
-
-- Confirm Restart Word and Next Word on physical Android hardware, including rapid taps and the final word.
-- Verify the Golden Return occurs precisely at loop completion and does not resemble a Morse tone.
-- Test both whole-recording and focused-word looping with long trailing silences.
-- Recheck browser service-worker upgrades and Firefox playback.
-- Preserve the existing brass controls and their Android system-navigation clearance.
+Verify desktop Receiver on Firefox and GitHub Pages after clearing old service-worker caches. Test Quiet and Receiver with WAV files and empty recordings. Verify Notes keyboard shortcuts and Android-sized browser layout. Check that desktop resize and orientation changes preserve renderer dimensions. Evaluate the compact control alignment after user feedback.
